@@ -1,14 +1,28 @@
 ~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
 Installation -
 ~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
-* execute the following command -
-mvn install -Dtest=false
-* extract "indexer-beans.xml" file from "idea-repository-core" module and place
-  in classpath with the following edited value -
-  - set new "location" for "fsDirectory" bean.
+* build the whole project
+  mvn install -Dtest=false
 
-~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
-dependency -
-~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
-* manually install ibatis2 dependency problem.
-* required library - ibatis2-sqlmap-2.3.0.jar
+* make package executing the following command -
+  ./make-package
+
+* you will find the built project under "release-package/CURRENT" directory
+
+* if you want to deploy the project just copy CURRENT directory
+  or take the built JAR file.
+
+* you will find CURRENT/config directory
+
+* change database-configuration.properties
+
+* change index-configuration.properties
+
+server startup script is depending on ruby, so you must have ruby installed,
+if you don't like this script please contribute, i am not shell scripting expert :)
+
+* to run server
+  ./server start
+
+* to stop server
+  ./server stop
