@@ -1,0 +1,23 @@
+<item>
+  <title><![CDATA[hasankhan]]></title>
+  <createdOn><![CDATA[2007-07-14 15:30:37.234]]></createdOn>
+  <lastUpdatedOn><![CDATA[2007-07-14 15:30:37.234]]></lastUpdatedOn>
+  <fields>
+    <field name="title"><![CDATA[hasankhan]]></field>
+    <field name="role_read"><![CDATA[true]]></field>
+    <field name="role_write"><![CDATA[true]]></field>
+    <field name="role_admin"><![CDATA[true]]></field>
+    <field name="password"><![CDATA[nhmthk]]></field>
+  </fields>
+  <relatedItems>
+    <blog>
+      <item>11</item>
+      <item>22</item>
+    </blog>
+    <user>
+      <item>33</item>
+      <item>44</item>
+      <item>55</item>
+    </user>
+  </relatedItems>
+</item>

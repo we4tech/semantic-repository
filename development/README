@@ -1,0 +1,14 @@
+~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
+Installation -
+~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
+* execute the following command -
+mvn install -Dtest=false
+* extract "indexer-beans.xml" file from "idea-repository-core" module and place
+  in classpath with the following edited value -
+  - set new "location" for "fsDirectory" bean.
+
+~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
+dependency -
+~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\
+* manually install ibatis2 dependency problem.
+* required library - ibatis2-sqlmap-2.3.0.jar

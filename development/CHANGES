@@ -1,0 +1,38 @@
+~~~~~~~~~~~~~~~~~~~~~~~~
+RELEASE - 0.4
+~~~~~~~~~~~~~~~~~~~~~~~~
+features -
+1. exposed lucene index administration through JMX
+2. date based range search is supported
+3. authentication hash key is generated when new user is registered.
+   authentication hash key is now based on userName + password.
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+RELEASE - 0.3 [15/07/07]
+~~~~~~~~~~~~~~~~~~~~~~~~
+features -
+1. only TestAll will be tested during installation
+2. removed item from web service client, created dependency on common api.
+3. /service/add-related-items/ added
+4. /service/delete-related-items/ added
+5. /service/find-related-items/ added
+6. /service/register/ added
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+RELEASE - 0.2 [10/07/07]
+~~~~~~~~~~~~~~~~~~~~~~~~
+features -
+1. standalone unit test
+2. added TestAll
+3. removed conflicting dependencies among the modules.
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+RELEASE - 0.1 [09/07/07]
+~~~~~~~~~~~~~~~~~~~~~~~~
+features-
+1. content repository
+2. lucene based content indexing
+3. RESTful web service integration
+4. RESTful web service client implementation
+5. RepositoryService Java API exposed.
+

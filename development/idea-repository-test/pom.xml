@@ -1,0 +1,78 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>idea-repository-parent</artifactId>
+    <groupId>com.ideabase.repository</groupId>
+    <version>0.4</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ideabase.repository.test</groupId>
+  <artifactId>idea-repository-test</artifactId>
+  <name>idea-repository-test</name>
+  <version>0.4</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+
+    <!-- Inter project dependencies -->
+    <!--
+      API MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-api</artifactId>
+      <groupId>com.ideabase.repository.api</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <!--
+      CORE MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-core</artifactId>
+      <groupId>com.ideabase.repository.core</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <!--
+      COMMON MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-common</artifactId>
+      <groupId>com.ideabase.repository.common</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <!--
+      RESTful web service MODULE
+    -->
+    <!--
+      COMMON MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-webservice</artifactId>
+      <groupId>com.ideabase.repository.webservice</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <!--
+      WS-CLIENT
+    -->
+    <dependency>
+      <artifactId>idea-repository-ws-client</artifactId>
+      <groupId>com.ideabase.repository.webservice.client</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+
+    <!--
+      SERVER MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-server</artifactId>
+      <groupId>com.ideabase.repository.server</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
+</project>

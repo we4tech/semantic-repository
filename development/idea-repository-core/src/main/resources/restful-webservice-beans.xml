@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+  <!--
+      Default url handler is based on the name property of bean definition.
+  -->
+  <!--<bean id="urlMapping"
+        class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>-->
+  <bean id="urlMapping"
+        class="com.ideabase.repository.webservice.handler.RESTUrlHandlerMapping">
+    <property name="patternMap">
+      <map>
+        <entry key="(^/service/.+$)" value-ref="restfulWebService"/>
+      </map>
+    </property>
+  </bean>
+  
+  <!--
+      Based RESTful service.
+  -->
+  <bean name="/service/*" id="restfulWebService"
+        class="com.ideabase.repository.webservice.controller.RESTfulControllerImpl">
+    <constructor-arg index="0" ref="repositoryService"/>
+    <constructor-arg index="1" ref="userService"/>
+    <constructor-arg index="2" ref="messageSourceAccessor"/>
+    <constructor-arg index="3" ref="queryParser"/>
+    <constructor-arg index="4" ref="webserviceRequestProcessor"/>
+    <constructor-arg index="5" ref="stateManager"/>
+  </bean>
+
+  <!--
+    Web service request processor implementation
+  -->
+  <bean id="webserviceRequestProcessor"
+        class="com.ideabase.repository.webservice.request.impl.WebServiceRequestHandlerImpl">
+    <property name="xmlRequestProcessor">
+      <bean class="com.ideabase.repository.webservice.request.xml.XmlRequestProcessorImpl"/>
+    </property>
+  </bean>
+  <!--
+      Query parser implementation
+  -->
+  <bean id="queryParser" class="org.apache.lucene.queryParser.QueryParser">
+    <constructor-arg index="0" value="title"/>
+    <constructor-arg index="1">
+      <bean class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+    </constructor-arg>
+  </bean>
+</beans>

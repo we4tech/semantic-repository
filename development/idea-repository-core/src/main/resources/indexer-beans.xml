@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:ext-util="http://dev.somewherein.net/schema/ext-util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+                           http://dev.somewherein.net/schema/ext-util http://dev.somewherein.net/resources/schemas/ext-util-0.1.xsd">
+
+  <!-- common services -->
+  <bean id="standardAnalyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+  <bean id="keywordAnalyzer" class="org.apache.lucene.analysis.KeywordAnalyzer"/>
+
+  <!-- import index services -->
+  <import resource="extfile:///./config/index-configuration/index-service-1.xml" />
+  <import resource="extfile:///./config/index-configuration/index-service-2.xml" />
+
+  <!-- available item index services -->
+  <bean id="itemIndexServices" class="com.ideabase.repository.core.bean.ObjectMap">
+    <property name="values">
+      <map>
+        <entry key="default" value-ref="itemIndex1"/>
+        <entry key="aawaj" value-ref="itemIndex2"/>
+      </map>
+    </property>
+  </bean>
+
+  <!-- available item search services -->
+  <bean id="itemSearchServices" class="com.ideabase.repository.core.bean.ObjectMap">
+    <property name="values">
+      <map>
+        <entry key="default" value-ref="itemSearch1"/>
+        <entry key="aawaj" value-ref="itemSearch2"/>
+      </map>
+    </property>
+  </bean>
+</beans>

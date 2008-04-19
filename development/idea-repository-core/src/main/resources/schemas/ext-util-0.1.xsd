@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://dev.somewherein.net/schema/ext-util"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://dev.somewherein.net/schema/ext-util"
+			elementFormDefault="qualified"
+			attributeFormDefault="unqualified">
+
+	<xsd:element name="resource">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="from-property" type="xsd:string"/>
+      <xsd:attribute name="or-default" type="xsd:string"/>
+      <xsd:attribute name="path-prefix" type="xsd:string"/>
+      <xsd:attribute name="scope" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

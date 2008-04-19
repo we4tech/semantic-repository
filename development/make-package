@@ -1,0 +1,20 @@
+rm -Rf release-package/CURRENT/
+mkdir release-package/CURRENT/
+mkdir release-package/CURRENT/lib
+
+cp -Rf config release-package/CURRENT/
+cp -Rf security release-package/CURRENT/
+cp -Rf ddl release-package/CURRENT/
+cp server-scripts/* release-package/CURRENT/
+
+find release-package/CURRENT/ -name .svn | xargs -J % rm -rf %
+find . -name *.jar | xargs -J % cp % release-package/CURRENT/lib
+
+rm release-package/repository-service-CURRENT.jar
+jar -cf release-package/repository-service-CURRENT.jar release-package/CURRENT/*
+
+echo =/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=
+echo   you package has been prepared under 
+echo --------------------------------------------------------------------------
+pwd release-package/CURRENT/
+echo  =/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:ext-util="http://dev.somewherein.net/schema/ext-util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+                           http://dev.somewherein.net/schema/ext-util http://dev.somewherein.net/resources/schemas/ext-util-0.1.xsd">
+
+  <ext-util:resource id="serverHost"
+                     from-property="server.host"
+                     or-default="localhost"
+                     path-prefix="sys:configuration"
+                     scope="server-configuration"/>
+  <ext-util:resource id="serverPort"
+                     from-property="server.port"
+                     or-default="localhost"
+                     path-prefix="sys:configuration"
+                     scope="server-configuration"/>
+  <ext-util:resource id="serverThreadPoolSize"
+                     from-property="server.thread.pool.size"
+                     or-default="100"
+                     path-prefix="sys:configuration"
+                     scope="server-configuration"/>
+  <ext-util:resource id="serverTmpDir"
+                     from-property="server.tmpdir"
+                     or-default="/tmp/repository-server"
+                     path-prefix="sys:configuration"
+                     scope="server-configuration"/>
+  <!--
+    jetty NIO connector
+  -->
+  <bean id="jettySelectChannelConnector" class="org.mortbay.jetty.nio.SelectChannelConnector">
+    <property name="host" ref="serverHost"/>
+    <property name="port" ref="serverPort"/>
+  </bean>
+
+  <!--
+    thread pool
+  -->
+  <bean id="jettyThreadPool" class="org.mortbay.thread.BoundedThreadPool">
+    <property name="maxThreads" ref="serverThreadPoolSize"/>
+  </bean>
+
+  <!--
+    repository server implementation
+  -->
+  <bean id="serverImpl" class="com.ideabase.repository.server.impl.JettyRepositoryServerImpl">
+    <property name="configuration">
+      <bean class="com.ideabase.repository.server.RepositoryServerConfiguration">
+        <property name="properties">
+          <map>
+            <entry key="connector" value-ref="jettySelectChannelConnector"/>
+            <entry key="theadPool" value-ref="jettyThreadPool"/>
+            <entry key="tmpDir" value-ref="serverTmpDir"/>
+          </map>
+        </property>
+      </bean>
+    </property>
+  </bean>
+</beans>

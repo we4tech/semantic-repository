@@ -1,0 +1,30 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>idea-repository-parent</artifactId>
+    <groupId>com.ideabase.repository</groupId>
+    <version>0.4</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ideabase.repository.api</groupId>
+  <artifactId>idea-repository-api</artifactId>
+  <name>idea-repository-api</name>
+  <version>0.4</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+      COMMON MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-common</artifactId>
+      <groupId>com.ideabase.repository.common</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
+</project>

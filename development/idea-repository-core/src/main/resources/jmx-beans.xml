@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+
+  <!--
+    JMX related beans
+  -->
+  <bean id="indexAdministrationJMXBean"
+        class="com.ideabase.repository.core.jmx.impl.LuceneIndexAdministrationBean">
+
+    <!-- required constructor injection -->
+    <constructor-arg index="0" ref="repositoryService"/>
+
+    <!-- setter injection for index factory -->
+    <!-- add list of available index services -->
+    <property name="repositoryItemIndexServices" ref="itemIndexServices"/>
+
+    <!-- add list of available search services -->
+    <property name="repositoryItemSearchServices" ref="itemSearchServices"/>
+  </bean>
+
+  <!--
+    JMX bean server
+  -->
+  <bean id="mbeanServer"
+        class="org.springframework.jmx.support.MBeanServerFactoryBean">
+    <!-- indicate to first look for a server -->
+     <property name="locateExistingServerIfPossible" value="true"/>
+  </bean>
+  
+  <!--
+    JMX bean exporter
+  -->
+  <bean id="exporter"
+        class="org.springframework.jmx.export.MBeanExporter"
+        lazy-init="false">
+    <property name="assembler" ref="assembler"/>
+    <property name="autodetect" value="true"/>
+    <property name="namingStrategy" ref="namingStrategy"/>
+    <property name="server" ref="mbeanServer"/>
+    <property name="registrationBehaviorName" value="REGISTRATION_REPLACE_EXISTING"/>
+  </bean>
+
+  <!--
+    Create management interface based on annotation
+  -->
+  <bean id="jmxAttributeSource"
+          class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+  <bean id="assembler"
+        class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+    <property name="attributeSource" ref="jmxAttributeSource"/>
+  </bean>
+
+  <!--
+    Pick object name from annotiation.
+  -->
+  <bean id="namingStrategy"
+        class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+    <property name="attributeSource" ref="jmxAttributeSource"/>
+  </bean>
+  
+</beans>

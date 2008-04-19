@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+  <!--
+       Event manager is responsible to publish all events to the subscribed
+       event consumer.
+   -->
+  <bean id="eventManager"
+        class="com.ideabase.repository.core.service.EventManagerImpl"/>
+
+  <!--
+      Request State manager the default implementation is based on hashmap,
+      if requires to handle many user you can alter the implemenation.
+  -->
+  <bean id="stateManager"
+        class="com.ideabase.repository.core.service.HashMapStateManagerImpl">
+    <property name="prefix" value="repository_"/>
+    <property name="suffix" value="rest api"/>
+  </bean>
+
+  <!--
+      User service is reponsible to create, delete, update and authenticate
+      and authorize user object.
+  -->
+  <bean id="userService"
+        class="com.ideabase.repository.core.service.UserServiceImpl">
+    <constructor-arg index="0" ref="repositoryService"/>
+    <property name="loginModuleName" value="RepositoryLogin"/>
+    <property name="stateManager" ref="stateManager"/>
+  </bean>
+
+  <!--
+    Repository Sevice is the core api, this service is reponsible to
+    create/update/delete any kind of repository object. this service is also
+    responsible to subscribe and unsubscribe an event consumer.
+  -->
+  <bean id="repositoryService"
+        class="com.ideabase.repository.core.service.RepositoryServiceImpl">
+    <constructor-arg index="0" ref="itemDAO"/>
+    <constructor-arg index="1" ref="itemMappingDAO"/>
+    <constructor-arg index="2" ref="eventManager"/>
+
+    <!-- add list of available index services -->
+    <property name="repositoryItemIndexServices" ref="itemIndexServices"/>
+
+    <!-- add list of available search services -->
+    <property name="repositoryItemSearchServices" ref="itemSearchServices"/>
+  </bean>
+
+</beans>

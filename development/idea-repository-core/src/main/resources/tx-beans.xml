@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:ext-util="http://dev.somewherein.net/schema/ext-util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+                           http://dev.somewherein.net/schema/ext-util http://dev.somewherein.net/resources/schemas/ext-util-0.1.xsd">
+
+
+  <!-- initiate database configuration from different environment state -->
+  <ext-util:resource id="jdbcDriverClassName"
+                     from-property="jdbc.driverClassName"
+                     or-default="com.mysql.jdbc.Driver"
+                     path-prefix="sys:configuration"
+                     scope="database-configuration"/>
+
+  <ext-util:resource id="jdbcUrl"
+                     from-property="jdbc.url"
+                     or-default="jdbc:mysql://localhost:3307/repository_test?jdbcCompliantTruncation=false"
+                     path-prefix="sys:configuration"
+                     scope="database-configuration"/>
+
+  <ext-util:resource id="jdbcUsername"
+                     from-property="jdbc.username"
+                     or-default="root"
+                     path-prefix="sys:configuration"
+                     scope="database-configuration"/>
+
+  <ext-util:resource id="jdbcPassword"
+                     from-property="jdbc.password"
+                     or-default="hasankhan"
+                     path-prefix="sys:configuration"
+                     scope="database-configuration"/>
+
+  <!-- Data source -->
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close">
+    <property name="driverClassName" ref="jdbcDriverClassName"/>
+    <property name="url" ref="jdbcUrl"/>
+    <property name="username" ref="jdbcUsername"/>
+    <property name="password" ref="jdbcPassword"/>
+  </bean>
+
+  <!-- Transaction manager, change it to JTA on production release. -->
+  <bean id="txManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+</beans>

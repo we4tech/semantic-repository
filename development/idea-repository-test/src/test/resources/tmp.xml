@@ -1,0 +1,20 @@
+<response state="true">
+  <item>
+    <target-class>GenericItem</target-class>
+    <id>406</id>
+    <title><![CDATA[the brown fox jump over the...]]></title>
+    <createdOn><![CDATA[15/07/2007 15:03:45]]></createdOn>
+    <lastUpdatedOn><![CDATA[15/07/2007 15:03:45]]></lastUpdatedOn>
+    <fields>
+      <field name="title"><![CDATA[the brown fox jump over the...]]></field>
+      <field name="email"><![CDATA[hasan@somewherein.net]]></field>
+      <field name="name"><![CDATA[the brown fox jump over the...]]></field>
+    </fields>
+    <relatedItems>
+      <related>
+        <item>396</item>
+        <item>397</item>
+      </related>
+    </relatedItems>
+  </item>
+</response>

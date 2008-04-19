@@ -1,0 +1,9 @@
+<!-- #uri: */item/login/param_user&param_password -->
+<!--
+post 'user' and 'password' fields.
+-->
+
+<!-- #expected response -->
+<response state="true">
+  <authToken>2323adfa23423adfa32</authToken>
+</response>

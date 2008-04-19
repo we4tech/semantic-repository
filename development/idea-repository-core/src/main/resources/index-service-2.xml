@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:ext-util="http://dev.somewherein.net/schema/ext-util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+                           http://dev.somewherein.net/schema/ext-util http://dev.somewherein.net/resources/schemas/ext-util-0.1.xsd">
+
+
+  <ext-util:resource id="directoryResource2"
+                     from-property="index2.directory"
+                     path-prefix="sys:configuration"
+                     scope="test"/>
+  <bean id="fsDirectory2"
+        class="org.springmodules.lucene.index.support.FSDirectoryFactoryBean">
+    <property name="location" ref="directoryResource2"/>
+  </bean>
+
+  <bean id="indexFactory2"
+        class="org.springmodules.lucene.index.support.SimpleIndexFactoryBean">
+    <property name="directory" ref="fsDirectory2"/>
+    <property name="create" value="true"/>
+    <property name="analyzer" ref="standardAnalyzer"/>
+    <property name="resolveLock" value="true"/>
+  </bean>
+
+  <bean id="searchFactroy2"
+        class="org.springmodules.lucene.search.factory.SimpleSearcherFactory">
+    <property name="directory" ref="fsDirectory2"/>
+    <property name="indexFactory" ref="indexFactory2"/>
+  </bean>
+
+  <bean id="itemIndex2"
+        class="com.ideabase.repository.core.index.impl.RepositoryItemIndexImpl">
+    <property name="indexFactory" ref="indexFactory2"/>
+  </bean>
+
+  <!-- Repository item searcher -->
+  <bean id="itemSearch2"
+        class="com.ideabase.repository.core.search.impl.RepositoryItemSearchImpl">
+    <property name="analyzer" ref="keywordAnalyzer"/>
+    <property name="searcherFactory" ref="searchFactroy2"/>
+  </bean>
+</beans>

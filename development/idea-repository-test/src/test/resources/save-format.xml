@@ -1,0 +1,29 @@
+<request>
+  <item>
+    <id>3</id>
+    <!-- Required fields -->
+    <title><![CDATA[very unique name]]></title>
+    <createdOn>29/06/2007 12:34:07</createdOn>
+    <lastUpdatedOn>29/06/2007 12:34:17</lastUpdatedOn>
+    <fields>
+      <field name="email"><![CDATA[hasan@somewherein.net]]></field>
+      <field name="address"><![CDATA[11/1 kabi jashim uddin road]]></field>
+      <field name="url"><![CDATA[http://hasan.we4tech.com]]></field>
+      <field name="favorite_color"><![CDATA[red]]></field>
+    </fields>
+
+    <!-- Optional fields -->
+<!--
+    <relatedItems>
+      <blog>
+        <item>29</item>
+        <item>48</item>
+      </blog>
+      <user>
+        <item>63</item>
+        <item>66</item>
+      </user>
+    </relatedItems>
+-->
+  </item>
+</request>

@@ -1,0 +1,25 @@
+grant  Principal com.ideabase.repository.core.auth.RepositoryUserPrincipal "user" {
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/get/.+", "GET";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/find/.+", "GET";
+};
+
+grant  Principal com.ideabase.repository.core.auth.RepositoryUserPrincipal "admin" {
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/get/.+", "GET";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/save/.+", "POST";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/update/.+", "POST";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/delete/.+", "DELETE";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/find/.+", "GET";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/add-related-items/.+", "POST";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/delete-related-items/.+", "POST";
+  permission com.ideabase.repository.core.auth.URLPermission
+  ".+/find-related-items/.+", "POST";
+};

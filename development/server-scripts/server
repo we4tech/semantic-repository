@@ -1,0 +1,88 @@
+#!/usr/local/bin/ruby
+# start java based jetty application servlet container.
+
+# define configurable paths
+JETTY_HOME = "./"
+MAIN_CLASS = "com.ideabase.repository.server.RepositoryServerMain"
+EXECUTALBE_JAVA = "java"
+RUNNER_VERSION = "0.1"
+
+# jetty runner is used to build class path and required configuration 
+# to execute java based jetty container.
+class JettyRunner
+  
+  # default constructor
+  def initialize
+    @classpaths = []
+    @options = []
+  end
+  
+  # find files from the specified directory and add files 
+  # in the class path variable
+  def add_classpath(p_path)
+    puts "looking at path - #{p_path} for new jar files."
+    Dir.new(p_path).each {|file|
+      @classpaths << "#{p_path}/#{file}"
+    }
+    return self
+  end
+  
+  def add_option(p_key, p_value = nil)
+    if !p_value.nil?
+      @options.push("-D#{p_key}=#{p_value}")
+    else
+      @options.push("-D#{p_key}")
+    end
+  end
+  
+  def get_options
+    return @options.join(" ")
+  end
+  
+  # return class paths in a strig form
+  def get_classpaths
+    @classpaths.join(":")
+  end
+  
+  # build executable commands
+  def get_commands
+    puts "building executable commands."
+    init_command = "cd #{JETTY_HOME}\r\n"
+    add_option("-Dcom.sun.management.jmxremote")
+    commands = "#{init_command}#{EXECUTALBE_JAVA} #{get_options()} -classpath \"#{get_classpaths}:config\" #{MAIN_CLASS}"
+  end
+  
+  # execute command
+  def run
+    puts "starting repository server - version - #{RUNNER_VERSION}"
+    commands = get_commands
+    puts "Executing command - #{commands}"
+    f1 = fork {
+      f = File.open("/tmp/repository.pid", "w")
+      f.write Process.pid
+      f.close
+      exec(commands)      
+    }
+    puts "jetty servlet container started."    
+  end
+  
+  def stop
+    puts "stopping repository server."
+    exec("cat /tmp/repository.pid | xargs -J % kill %")
+  end
+end
+
+# set up default class paths
+jetty_runner = JettyRunner.new
+jetty_runner.add_classpath("lib")
+
+# find option
+if !ARGV.nil?
+  action = ARGV[0]
+  if "stop" == action
+    jetty_runner.stop
+  elsif "start" == action
+    # execute command
+    jetty_runner.run
+  end
+end

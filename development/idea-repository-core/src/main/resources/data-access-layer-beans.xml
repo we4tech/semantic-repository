@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+  <bean id="sqlMapClient"
+        class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+    <property name="configLocation" value="classpath:/config/sql-map-config.xml"/>
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <!-- Repository Item DAO -->
+  <bean id="itemDAO"
+        class="com.ideabase.repository.core.dao.impl.ItemDAOImpl">
+    <property name="sqlMapClient" ref="sqlMapClient"/>
+  </bean>
+
+  <!-- Repository Item mapping DAO -->
+  <bean id="itemMappingDAO"
+        class="com.ideabase.repository.core.dao.impl.ItemMappingDAOImpl">
+    <property name="sqlMapClient" ref="sqlMapClient"/>
+  </bean>
+
+</beans>

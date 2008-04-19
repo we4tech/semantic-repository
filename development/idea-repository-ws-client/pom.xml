@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project>
+  <parent>
+    <artifactId>idea-repository-parent</artifactId>
+    <groupId>com.ideabase.repository</groupId>
+    <version>0.4</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ideabase.repository.webservice.client</groupId>
+  <artifactId>idea-repository-ws-client</artifactId>
+  <name>idea-repository-ws-client</name>
+  <version>0.4</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+
+    <!-- Dependency on http client -->
+    <dependency>
+      <groupId>commons-http</groupId>
+      <artifactId>commons-http</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.0</version>
+    </dependency>
+
+    <!--
+      COMMON MODULE
+    -->
+    <dependency>
+      <artifactId>idea-repository-common</artifactId>
+      <groupId>com.ideabase.repository.common</groupId>
+      <version>${pom.version}</version>
+    </dependency>
+
+  </dependencies>
+</project>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>idea-repository-parent</artifactId>
+    <groupId>com.ideabase.repository</groupId>
+    <version>0.4</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ideabase.repository.webservice.ruby.client</groupId>
+  <artifactId>idea-repository-ws-ruby-client</artifactId>
+  <name>idea-repository-ws-ruby-client</name>
+  <version>1.0-SNAPSHOT</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

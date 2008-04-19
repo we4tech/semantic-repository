@@ -1,0 +1,8 @@
+<response state="true">
+  <items>
+    <item>/service/get/139</item>
+    <item>/service/get/140</item>
+  </items>
+  <max-rows><![CDATA[5]]></max-rows>
+  <page-count><![CDATA[3]]></page-count>
+</response>

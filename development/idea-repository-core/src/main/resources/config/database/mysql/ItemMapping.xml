@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ItemMapping">
+
+  <!--+
+      | Insert new mapping into the table.
+      +-->
+  <insert id="insertMapping" parameterClass="ItemMapping">
+    INSERT INTO itemmapping (
+      leftId, rightId, relationType
+    ) VALUES (
+      #leftId#,
+      #rightId#,
+      #relationType#
+    )
+
+    <selectKey keyProperty="id" resultClass="java.lang.Integer">
+      SELECT MAX(id) FROM itemmapping;
+    </selectKey>
+  </insert>
+
+  <!--+
+      | Update mapping based on mapping id.
+      +-->
+  <update id="updateMapping" parameterClass="ItemMapping">
+    UPDATE itemmapping
+    SET
+      leftId = #leftId#,
+      rightId = #rightId#,
+      relationType = #relationType#
+    WHERE
+      id = #id#
+  </update>
+
+  <!--+
+      | Delete mapping from ItemMapping table based on query built from
+      | ItemMapping object parameters.
+      +-->
+  <delete id="deleteMappings" parameterClass="ItemMapping">
+    DELETE FROM itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </delete>
+
+  <!--+
+      | Find all right side attached object id.
+      +-->
+  <select id="findByLeftId" parameterClass="ItemMapping" resultClass="ItemMapping">
+    SELECT
+      id, leftId, rightId, relationType
+    FROM
+      itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </select>
+
+  <!--+
+      | Find all left side attached object id.
+      +-->
+  <select id="findByRightId" parameterClass="ItemMapping" resultClass="ItemMapping">
+    SELECT
+      id, leftId, rightId, relationType
+    FROM
+      itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </select>
+
+  <!--+
+      | Count all right side attached objects
+      +-->
+  <select id="countByLeftId" parameterClass="ItemMapping" resultClass="Integer">
+    SELECT
+      count(rightId)
+    FROM
+      itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </select>
+
+  <!--+
+      | Count all left side attached objects
+      +-->
+  <select id="countByRightId" parameterClass="ItemMapping" resultClass="Integer">
+    SELECT
+      count(leftId)
+    FROM
+      itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </select>
+
+  <!--+
+      | Find all mapping objects.
+      +-->
+  <select id="findMapping" parameterClass="ItemMapping" resultClass="ItemMapping">
+    SELECT
+      id, leftId, rightId, relationType
+    FROM
+      itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </select>
+
+  <!--+
+      | Find unique relation type
+      +-->
+  <select id="findMappingRelationTypes" parameterClass="ItemMapping" resultClass="String">
+    SELECT DISTINCT
+      relationType
+    FROM
+      itemmapping
+    <dynamic prepend="WHERE">
+      <isNotNull property="id" prepend="AND">
+        id = #id#
+      </isNotNull>
+      <isNotNull property="leftId" prepend="AND">
+        leftId = #leftId#
+      </isNotNull>
+      <isNotNull property="rightId" prepend="AND">
+        rightId = #rightId#
+      </isNotNull>
+      <isNotNull property="relationType" prepend="AND">
+        relationType = #relationType#
+      </isNotNull>
+    </dynamic>
+  </select>
+</sqlMap>

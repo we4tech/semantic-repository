@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+  <!-- Enable autho Aspect discovery -->
+  <aop:aspectj-autoproxy />
+
+  <!-- Define Architectural scope of poincuts -->
+  <bean class="com.ideabase.repository.core.aspect.ArchitecturePointcuts"/>
+
+  <!-- Define event manager advice for Data access layer -->
+  <bean class="com.ideabase.repository.core.aspect.DataAccessEventAdvice">
+    <constructor-arg index="0" ref="eventManager"/>
+  </bean>
+
+  <!-- Define event manager advice for Indexing service -->
+  <bean class="com.ideabase.repository.core.aspect.IndexEventAdvice">
+    <constructor-arg index="0" ref="eventManager"/>
+  </bean>
+
+  <!-- Define AA advice for each web request. -->
+  <bean class="com.ideabase.repository.webservice.advice.WebAuthenticationAndAuthorizationAdvice">
+    <constructor-arg index="0" ref="userService"/>
+    <property name="stateManager" ref="stateManager"/>
+  </bean>
+
+  <!--
+      Define Object integirty test advice, it verify the integirity of object
+  -->
+  <bean class="com.ideabase.repository.core.aspect.ObjectIntegrityTestAdvice">
+    <constructor-arg index="0" ref="repositoryService"/>
+  </bean>
+</beans>

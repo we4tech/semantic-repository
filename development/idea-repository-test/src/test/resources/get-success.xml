@@ -1,0 +1,25 @@
+<response state="true">
+  <item>
+    <id>317</id>
+    <title><![CDATA[hasan]]></title>
+    <createdOn>04/07/2007 10:54:39</createdOn>
+    <lastUpdatedOn>04/07/2007 10:54:39</lastUpdatedOn>
+    <fields>
+      <field name="title"><![CDATA[hasan]]></field>
+      <field name="role_read"><![CDATA[true]]></field>
+      <field name="role_write"><![CDATA[true]]></field>
+      <field name="role_admin"><![CDATA[true]]></field>
+      <field name="password"><![CDATA[hasankhan]]></field>
+    </fields>
+    <relatedItems>
+      <blog>
+        <item>323</item>
+        <item>3232</item>
+      </blog>
+      <user>
+        <item>1323</item>
+        <item>2323</item>
+      </user>
+    </relatedItems>
+  </item>
+</response>

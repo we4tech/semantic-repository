@@ -1,0 +1,10 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Feature list for v-0.2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. add support for adding new related item.
+2. add support for removing new related item.
+3. implement web service REST client for Ruby on rails.
+4. remove none required dependencies
+5. use hsql as default database
+6. expose "optimize" and "register" function over JMX support
+ 
