@@ -1,21 +1,27 @@
 <?php
   require 'repository_client.php';
 
-  $authToken = Repository_Client::login("we4tech", "hasankhan");
+  $authToken = Repository_Client::login("mac1", "mac1");
   echo "Authenticated token - $authToken\r\n";
   
-  $items = Repository_Client::find($authToken, "content:(shilpakala academy)", 2, 2, "id", "true");
-  foreach ($items as $itemRef) {
-    print_r($itemRef);
-    print_r(Repository_Client::getItem($authToken, $itemRef[0]));
+  /*// save new item
+  $prices = array(120000, 22000, 14900, 14000, 10000);
+  foreach ($prices as $price) {
+    $item = new Repository_Item();
+    $item->title = "PHPTEST_ test from php script";
+    $item->addField("test1", "Hello curl world");
+    $item->addField("price", $price);
+    $item->indexRepository = "aawaj";
+    Repository_Client::save($authToken, $item);
+  }*/
+
+  // find item and sort by price
+  $items = Repository_Client::find($authToken, "price:[0 TO 22000]", array("select" => "item_id, price"));
+  foreach ($items as $item) {
+    echo($item[2]["price"]);
+    echo "\n";
+    echo($item[2]["item_id"]);
+    echo "\n";
+    print_r(Repository_Client::getItem($authToken, $item[0]));
   }
-
-  // save new item
-  $item = new Repository_Item();
-  $item->title = "test from php script";
-  $item->addField("test1", "Hello curl world");
-  Repository_Client::save($authToken, $item);
-
-  echo "\r\nnewly created Item id - " . $item->id . "\r\n";
-  echo "removed ? - " . (Repository_Client::remove($authToken, $item->id) ? "yes" : "no") . "\r\n";
 ?>

@@ -23,10 +23,14 @@
  ******************************************************************************
 */
 package com.ideabase.repository.webservice.helper;
+
 import java.util.List;
 import java.util.ArrayList;
 
 import static com.ideabase.repository.common.XmlConstants.*;
+import static com.ideabase.repository.common.PHPConstants.*;
+import static com.ideabase.repository.common.CommonConstants.*;
+import static com.ideabase.repository.common.StringUtil.*;
 import com.ideabase.repository.common.formatter.XmlSerializable;
 import com.ideabase.repository.common.formatter.PHPSerializable;
 import com.ideabase.repository.common.object.ObjectBase;
@@ -45,18 +49,18 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
   private final List<ResponseElement> mResponseElements =
       new ArrayList<ResponseElement>();
 
+  /**
+   * Default constructor.
+   * @param pName root element name
+   * @param pValue element value object
+   */
   public ResponseElement(final String pName, final Object pValue) {
     mName = pName;
     mValue = pValue;
   }
 
-  public String getName() {
-    return mName;
-  }
-
-  public Object getValue() {
-    return mValue;
-  }
+  public String getName() { return mName; }
+  public Object getValue() { return mValue; }
 
   public ResponseElement addResponseElement(
       final ResponseElement pResponseElement) {
@@ -77,7 +81,7 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
       pBuilder.append(ELEMENT_START).append(mName).
                append(ELEMENT_END);
       ((XmlSerializable) mValue).toXml(pBuilder);
-      pBuilder.append(ELEMENT_START).append("/").append(mName).
+      pBuilder.append(ELEMENT_START).append(SLASH).append(mName).
                append(ELEMENT_END);
     } else if (mValue instanceof List) {
       for (final Object value : (List) mValue) {
@@ -86,7 +90,7 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
         pBuilder.append(BLOCK_CDATA_START);
         pBuilder.append(value);
         pBuilder.append(BLOCK_CDATA_END);
-        pBuilder.append(ELEMENT_START).append("/").append(mName).
+        pBuilder.append(ELEMENT_START).append(SLASH).append(mName).
                  append(ELEMENT_END);
       }
     } else {
@@ -95,7 +99,7 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
       pBuilder.append(BLOCK_CDATA_START);
       pBuilder.append(mValue);
       pBuilder.append(BLOCK_CDATA_END);
-      pBuilder.append(ELEMENT_START).append("/").append(mName).
+      pBuilder.append(ELEMENT_START).append(SLASH).append(mName).
                append(ELEMENT_END);
     }
 
@@ -113,29 +117,32 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
     }
     // php serialized value
     else if (mValue instanceof PHPSerializable) {
-      pBuilder.append("'").append(mName).append("' => ");
+      pBuilder.append(QUOTE).append(mName).append(QUOTE).append(ASSIGN);
       ((PHPSerializable) mValue).toPHP(pBuilder);
       appendComma(pBuilder);
     }
     // list of values
     else if (mValue instanceof List) {
-      pBuilder.append("'").append(mName).append("' => ").append("array(");
+      pBuilder.append(QUOTE).append(mName).append(QUOTE).
+               append(ASSIGN).append(ARRAY_START);
       boolean started = false;
       for (final Object value : (List) mValue) {
         if (started) {
-          pBuilder.append(",");
+          pBuilder.append(COMMA);
         } else {
           started = true;
         }
-        pBuilder.append("'").append(value).append("'");
+        pBuilder.append(QUOTE).
+            append(escapeIllegalText(String.valueOf(value))).append(QUOTE);
       }
-      pBuilder.append(")");
+      pBuilder.append(END_BRACE);
       appendComma(pBuilder);
     }
     // default value
     else {
-      pBuilder.append("'").append(mName).append("'").
-          append(" => '").append(mValue).append("'");
+      pBuilder.append(QUOTE).append(escapeIllegalText(mName)).append(QUOTE).
+          append(ASSIGN).append(QUOTE).
+          append(escapeIllegalText(String.valueOf(mValue))).append(QUOTE);
       appendComma(pBuilder);
     }
 
@@ -143,7 +150,7 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
     boolean started = false;
     for (final ResponseElement responseElement : mResponseElements) {
       if (started) {
-        pBuilder.append(", ");
+        pBuilder.append(COMMA);
       } else {
         started = true;
       }
@@ -153,7 +160,7 @@ public class ResponseElement implements XmlSerializable, PHPSerializable {
 
   private void appendComma(final StringBuilder pBuilder) {
     if (mResponseElements != null && !mResponseElements.isEmpty()) {
-      pBuilder.append(",");
+      pBuilder.append(COMMA);
     }
   }
 }

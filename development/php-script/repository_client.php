@@ -141,8 +141,8 @@
      }
    }
 
-   function getItem($pAuthToken, $pItemId) {
-     $response = Repository_Http_Client::get($pItemId . ".php", array(PARAM_AUTH_TOKEN => $pAuthToken));
+   function getItem($pAuthToken, $pItemId, $pIndex = "default") {
+     $response = Repository_Http_Client::get($pItemId . ".php", array(PARAM_AUTH_TOKEN => $pAuthToken, "index" => $pIndex));
      $object = eval($response);
      if ($object["state"]) {
        $itemObject = $object[0];
@@ -167,15 +167,27 @@
      return preg_replace('/[a-zZ-a\/\.]+/', '', $pItemUri);
    }
 
-   function find($pAuthToken, $pQuery, $pOffset = 0, $pMax = 10, $pSortBy = null, $pOrder = null) {
-     $params = array(PARAM_AUTH_TOKEN => $pAuthToken, "q" => $pQuery, "max" => $pMax, "offset" => $pOffset);
+   function find($pAuthToken, $pQuery, $pOptions = array()) {
+     $max = $pOptions["max"];
+     if (empty($max)) { $max = 10; }
+
+     $offset = $pOptions["offset"];
+     if (empty($offset)) { $offset = 0; }
+
+     $index = $pOptions["index"];
+     if (empty($index)) { $index = "default"; }
+
+     $select = $pOptions["select"];
+     if (empty($select)) { $select = ""; }
+
+     $params = array(PARAM_AUTH_TOKEN => $pAuthToken, "q" => $pQuery, "max" => $max, "offset" => $offset, "index" => $index, "select" => $select);
      if (!empty($pSortBy)) {
       $params["sortby"] = $pSortBy;
      }
      if (!empty($pOrder)) {
       $params["order"] = $pOrder;    
      }
-     $response = Repository_Http_Client::get("/service/find/q.php",$params);
+     $response = Repository_Http_Client::get("/service/find/q.php", $params);
      $object = eval($response);
      $items = array();
      if ($object["state"]) {
@@ -188,8 +200,8 @@
      return $items;
    }
 
-   function save($pAuthToken, &$pItem) {
-     $response = Repository_Http_Client::post("/service/save/i.xml", array(PARAM_AUTH_TOKEN => $pAuthToken, "i" => $pItem->toRequest()));
+   function save($pAuthToken, &$pItem, $pIndex = "default") {
+     $response = Repository_Http_Client::post("/service/save/i.xml", array(PARAM_AUTH_TOKEN => $pAuthToken, "i" => $pItem->toRequest(), "index" => $pIndex));
      if (preg_match("/state=\"true\"/", $response)) {
        $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA);
        $itemId = Repository_Client::formatItemId($xml->item);
@@ -199,8 +211,8 @@
      return false;
    }
 
-   function remove($pAuthToken, $pItemId) {
-     $params = array(PARAM_AUTH_TOKEN => $pAuthToken);
+   function remove($pAuthToken, $pItemId, $pIndex = "default") {
+     $params = array(PARAM_AUTH_TOKEN => $pAuthToken, "index" => $pIndex);
      $response = Repository_Http_Client::deleteRequest("/service/delete/$pItemId.php", $params);
      $object = eval($response);
      if ($object["state"]) {

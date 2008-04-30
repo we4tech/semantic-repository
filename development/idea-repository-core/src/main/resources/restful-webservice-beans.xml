@@ -46,7 +46,7 @@
   <!--
       Query parser implementation
   -->
-  <bean id="queryParser" class="org.apache.lucene.queryParser.QueryParser">
+  <bean id="queryParser" class="com.ideabase.repository.core.index.ExtendedQueryParser">
     <constructor-arg index="0" value="title"/>
     <constructor-arg index="1">
       <bean class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>

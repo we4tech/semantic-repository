@@ -83,6 +83,16 @@ public class WebConstants {
   public static final String PARAM_ORDER = "order";
 
   /**
+   * Define selectable fields during search result.
+   */
+  public static final String PARAM_SELECT = "select";
+
+  /**
+   * Use user defined seprator
+   */
+  public static final String PARAM_SEPARATOR = "separator";
+
+  /**
    * Sortable fields separatoar.
    */
   public static final String SORTABLE_FIELDS_SEPARATOR = ",";

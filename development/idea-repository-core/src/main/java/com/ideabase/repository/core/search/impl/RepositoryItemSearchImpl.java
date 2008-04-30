@@ -31,10 +31,7 @@ import org.springmodules.lucene.search.factory.LuceneHits;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.search.HitCollector;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.*;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.log4j.Logger;
@@ -97,44 +94,52 @@ public class RepositoryItemSearchImpl extends LuceneSearchSupport
         populateHitCollector(hitCollector,
             searcher.search(pQuery.buildQuery(), Sort.RELEVANCE));
       } else {
-        // determine sortable field or sorting type default sort is based on
-        // relevance
-        Sort sort = new Sort();
-        final List<SortField> sortFields = new ArrayList<SortField>();
-        for (final Map.Entry<String, Boolean> entry : pQuery.getSortableFields().entrySet()) {
-          // verify special field like relevant and indexoredered
-          final String key = entry.getKey();
-          final Boolean decending = entry.getValue();
-          if (SORT_RELEVANT.equalsIgnoreCase(key)) {
-            LOG.debug("Applying relevance sorting.");
-            sort = Sort.RELEVANCE;
-            break;
-          } else if (SORT_INDEXORDERED.equalsIgnoreCase(key)) {
-            LOG.debug("Applying Index ordered sorting.");
-            sort = Sort.INDEXORDER;
-            break;
-          } else {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Applying sort field - " + key);
-            }
-            sortFields.add(new SortField(key, decending.booleanValue()));
-          }
-        }
-        if (!sortFields.isEmpty()) {
-          sort.setSort(sortFields.toArray(new SortField[] {}));
-        }
-
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Sortable fields - " + sort);
-        }
-        // perform lucene search and collect the search hits.
-        populateHitCollector(hitCollector,
-                             searcher.search(pQuery.buildQuery(), sort));
+        // determine sortable field and type
+        // by default sort is based on relevance
+        applySortingFilter(pQuery, hitCollector, searcher);
       }
       return hitCollector.getPaginatedList();
     } catch (Throwable e) {
       throw new ServiceException(pQuery, "Failed to perform search.", e);
     }
+  }
+
+  private void applySortingFilter(final Query pQuery,
+      final RepositoryItemSearchImpl.RepositoryHitCollectorImpl pHitCollector,
+      final LuceneSearcher pSearcher) throws IOException {
+    Sort sort = new Sort();
+    final List<SortField> sortFields = new ArrayList<SortField>();
+    for (final Map.Entry<String, Boolean> entry :
+         pQuery.getSortableFields().entrySet()) {
+      // verify special field like relevant and indexoredered
+      final String key = entry.getKey();
+      final Boolean decending = entry.getValue();
+      if (SORT_RELEVANT.equalsIgnoreCase(key)) {
+        LOG.debug("Applying relevance sorting.");
+        sort = Sort.RELEVANCE;
+        break;
+      } else if (SORT_INDEXORDERED.equalsIgnoreCase(key)) {
+        LOG.debug("Applying Index ordered sorting.");
+        sort = Sort.INDEXORDER;
+        break;
+      } else {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Applying sort field - " + key);
+        }
+        sortFields.add(new SortField(key, decending.booleanValue()));
+      }
+    }
+    if (!sortFields.isEmpty()) {
+      sort.setSort(sortFields.toArray(new SortField[] {}));
+    }
+
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Sortable fields - " + sort);
+    }
+
+    // perform lucene search and collect the search hits.
+    populateHitCollector(pHitCollector,
+                         pSearcher.search(pQuery.buildQuery(), sort));
   }
 
   private void populateHitCollector(
@@ -194,10 +199,9 @@ public class RepositoryItemSearchImpl extends LuceneSearchSupport
       hit.setId(id);
 
       // retrive stored fields
-      final Enumeration enumeration = pDocument.fields();
+      final List<Field> fieldList = pDocument.getFields();
       final Map<String, String> fields = new HashMap<String, String>();
-      while (enumeration.hasMoreElements()) {
-        final Field field = (Field) enumeration.nextElement();
+      for (final Field field : fieldList) {
         fields.put(field.name(), pDocument.get(field.name()));
       }
       hit.setFields(fields);

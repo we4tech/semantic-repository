@@ -20,6 +20,12 @@ package com.ideabase.repository.common;
  * @author <a href="http://hasan.we4tech.com">nhm tanveer...(hasan)</a>
  */
 public class CommonConstants {
+  public static final String SPACE = " ";
+  public static final String COMMA = ", ";
+  public static final String QUOTE = "'";
   public static final String INDEX_DEFAULT = "default";
   public static final String EMPTY_STRING = "";
+  public static final String FIELD_PREFIX_PRICE = "price";
+  public static final String FIELD_SUFFIX_ID = "_id";
+  public static final String FIELD_SUFFIX_DATE = "_date";
 }

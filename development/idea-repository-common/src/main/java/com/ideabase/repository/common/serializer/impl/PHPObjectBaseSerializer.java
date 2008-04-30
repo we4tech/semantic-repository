@@ -16,7 +16,10 @@
 package com.ideabase.repository.common.serializer.impl;
 
 import com.ideabase.repository.common.CommonConstants;
+import static com.ideabase.repository.common.StringUtil.*;
+import static com.ideabase.repository.common.CommonConstants.*;
 import static com.ideabase.repository.common.XmlConstants.*;
+import static com.ideabase.repository.common.PHPConstants.*;
 import com.ideabase.repository.common.object.ObjectBase;
 import com.ideabase.repository.common.serializer.ObjectBaseSerializer;
 
@@ -30,29 +33,39 @@ import java.util.Map;
 public class PHPObjectBaseSerializer implements ObjectBaseSerializer {
 
   public <T extends ObjectBase> String serializeObject(final T pObject) {
+
     final StringBuilder builder = new StringBuilder();
-    builder.append("array(");
+    builder.append(ARRAY_START);
     addItem(builder, ELEMENT_TARGET_CLASS,
             pObject.getClass().getSimpleName(), true, true);
     addItem(builder, ELEMENT_ID, String.valueOf(pObject.getId()), true, true);
-    addItem(builder, ELEMENT_TITLE, pObject.getTitle(), true, true);
+    addItem(builder, ELEMENT_TITLE,
+            escapeIllegalText(pObject.getTitle()), true, true);
     addItem(builder, ELEMENT_CREATED_ON,
             formattedDate(pObject.getCreatedOn()), true, false);
     addItem(builder, ELEMENT_LAST_UPDATED_ON,
             formattedDate(pObject.getLastUpdatedOn()), true, false);
+
+    String indexRepository = pObject.getIndexRepository();
+    if (indexRepository == null) { indexRepository = INDEX_DEFAULT; }
+    
     addItem(builder, ELEMENT_INDEX_REPOSITORY,
-            pObject.getIndexRepository(), true, true);
+            indexRepository, true, true);
     addItems(builder, ELEMENT_FIELDS, pObject.getFields());
-    builder.append(")");
+    builder.append(END_BRACE);
+
     return builder.toString();
   }
 
   private void addItems(final StringBuilder pBuilder,
-                        final String pItemName,
+                        final String pElementName,
                         final Map<String, String> pFields) {
-    pBuilder.append("'").append(pItemName).append("' => ");
+
+    pBuilder.append(QUOTE).
+        append(escapeIllegalText(pElementName)).append(QUOTE).append(ASSIGN);
+
     if (pFields != null && !pFields.isEmpty()) {
-      pBuilder.append("array(");
+      pBuilder.append(ARRAY_START);
       boolean canAddComma = pFields.size() > 1;
       int mapSize = pFields.size();
       int currentIndex = 0;
@@ -63,16 +76,16 @@ public class PHPObjectBaseSerializer implements ObjectBaseSerializer {
         addItem(pBuilder, entry.getKey(), entry.getValue(), canAddComma, true);
         currentIndex++;
       }
-      pBuilder.append(")");
+      pBuilder.append(END_BRACE);
     } else {
-      pBuilder.append("array()");
+      pBuilder.append(ARRAY_EMPTY);
     }
   }
 
   private String formattedDate(final Timestamp pTimestamp) {
     if (pTimestamp != null) {
       final StringBuilder builder = new StringBuilder();
-      builder.append("time(").append(pTimestamp.getTime()).append(")");
+      builder.append(TIME_START).append(pTimestamp.getTime()).append(END_BRACE);
       return builder.toString();
     }
     return CommonConstants.EMPTY_STRING;
@@ -82,25 +95,20 @@ public class PHPObjectBaseSerializer implements ObjectBaseSerializer {
                        final String pItemName,
                        final String pValue, final boolean pComma,
                        final boolean pQuote) {
-    pBuilder.append("'").append(pItemName).append("' => ");
+    pBuilder.append(QUOTE).
+        append(escapeIllegalText(pItemName)).append(QUOTE).append(ASSIGN);
     if (pQuote) {
-      pBuilder.append("'");
+      pBuilder.append(QUOTE);
       pBuilder.append(escapeIllegalText(pValue));
-      pBuilder.append("'");
+      pBuilder.append(QUOTE);
+
     } else {
       pBuilder.append(pValue);
     }
 
     if (pComma) {
-      pBuilder.append(",");
+      pBuilder.append(COMMA);
     }
-  }
-
-  private String escapeIllegalText(final String pValue) {
-    if (pValue != null) {
-      return pValue.replaceAll("(['])", "\\\\$1");
-    }
-    return pValue;
   }
 
   public <T extends ObjectBase> T deserializeObject(final String pContent) {

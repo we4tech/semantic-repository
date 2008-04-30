@@ -29,6 +29,7 @@ package com.ideabase.repository.common;
  */
 public class XmlConstants {
 
+  public static final String SLASH = "/";
   public static final String ELEMENT_RESPONSE = "response";
   public static final String ELEMENT_START = "<";
   public static final String ELEMENT_END = ">";
@@ -61,6 +62,7 @@ public class XmlConstants {
   public static final String QUOTE_END = "\"";
   public static final String ATTR_INDEX = "index";
   public static final String ATTR_SCORE = "score";
+  public static final String ATTR_URI = "uri";
   public static final String ATTR_STORE = "store";
   public static final String ATTR_TERM_VECTOR = "termVector";
   public static final String ELEMENT_FIELDS = "fields";

@@ -26,6 +26,7 @@ package com.ideabase.repository.common.object;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumberTools;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -39,6 +40,11 @@ import com.ideabase.repository.common.exception.ServiceException;
  * @author <a href="mailto:hasan@somewherein.net">nhm tanveer hossain khan (hasan)</a>
  */
 public class GenericItem extends AbstractObjectBase implements VisitableObject {
+
+  private static final String FIELD_PREFIX_PRICE = "price";
+  private static final String FIELD_SUFFIX_ID = "_id";
+  private static final String FIELD_SUFFIX_DATE = "_date";
+  private static final String FIELD_SUFFIX_NUMBER = "_number";
 
   private Integer mId;
   private transient String mTitle;
@@ -83,9 +89,22 @@ public class GenericItem extends AbstractObjectBase implements VisitableObject {
     // Add fields to indexable. (no store)
     acceptVisitor(new Visitor() {
       public void visitField(final String pName, final String pValue) {
-        final Field field =
-            new Field(pName, pValue, Field.Store.YES, Field.Index.TOKENIZED);
-        document.add(field);
+        // TODO: hardcoded behavior for indexing price or number type field
+        final String name = pName.toLowerCase();
+        if (name.startsWith(FIELD_PREFIX_PRICE) ||
+            name.endsWith(FIELD_SUFFIX_DATE) ||
+            name.endsWith(FIELD_SUFFIX_NUMBER)) {
+          document.add(new Field(
+              pName, NumberTools.longToString(Integer.parseInt(pValue)),
+              Field.Store.NO, Field.Index.UN_TOKENIZED));
+        } else if (name.endsWith(FIELD_SUFFIX_ID)) {
+          document.add(new Field(pName, pValue,
+                       Field.Store.NO, Field.Index.UN_TOKENIZED));
+        } else {
+          document.add(new Field(pName, pValue,
+                       Field.Store.NO, Field.Index.TOKENIZED,
+                       Field.TermVector.WITH_POSITIONS_OFFSETS));
+        }
       }
     });
     return document;

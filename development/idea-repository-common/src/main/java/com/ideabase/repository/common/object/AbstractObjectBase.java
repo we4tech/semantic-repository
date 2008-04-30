@@ -186,9 +186,8 @@ public abstract class AbstractObjectBase implements ObjectBase {
 
     if (mFields != null && !mFields.isEmpty()) {
       for (final Map.Entry<String, String> entry : mFields.entrySet()) {
-        Field field = new Field(entry.getKey(), entry.getValue(),
-            Field.Store.NO, Field.Index.TOKENIZED);
-        document.add(field);
+        document.add(new Field(entry.getKey(), entry.getValue(),
+                               Field.Store.NO, Field.Index.TOKENIZED));
       }
     }
     return document;

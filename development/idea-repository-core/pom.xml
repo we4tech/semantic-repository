@@ -3,13 +3,13 @@
   <parent>
     <artifactId>idea-repository-parent</artifactId>
     <groupId>com.ideabase.repository</groupId>
-    <version>0.4</version>
+    <version>0.5</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ideabase.repository.core</groupId>
   <artifactId>idea-repository-core</artifactId>
   <name>idea-repository-core</name>
-  <version>0.4</version>
+  <version>0.5</version>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

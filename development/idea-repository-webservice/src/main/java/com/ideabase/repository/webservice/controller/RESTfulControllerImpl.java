@@ -258,6 +258,12 @@ public class RESTfulControllerImpl implements RESTfulController {
   private static final String ACTION_UPDATE = "update";
 
   /**
+   * Find fields requesst for retrieving fields from a search set,
+   * instead of returnign the whole results it will return a single item with the merged results.
+   */
+  private static final String ACTION_FIND_FIELDS = "find_fields";
+
+  /**
    * No string is set.
    */
   private static final String EMPTY_STRING = "";
@@ -271,6 +277,11 @@ public class RESTfulControllerImpl implements RESTfulController {
    * Separate string with comma (,)
    */
   private static final String SEPARATOR_COMMA = ",";
+
+  /**
+   * Special content separator
+   */
+  private static final String SPECIAL_SEPARATOR_PIPE = "|";
 
   /**
    * Item uri prefix, this constant is used when an item has been created.
@@ -499,10 +510,81 @@ public class RESTfulControllerImpl implements RESTfulController {
     else if (ACTION_FIND_RELATED_ITEMS.equals(pAction.getAction())) {
       handleFindRelatedItemsAction(pAction, pRequest, pResponse);
     }
+    // handle find fields
+    else if (ACTION_FIND_FIELDS.equals(pAction.getAction())) {
+      handleFindFieldsAction(pAction, pRequest, pResponse);
+    }
     // handle unknown action
     else {
       invalidActionResponse(pAction, KEY_INVALID_ACTION, pResponse);
     }
+  }
+
+  private void handleFindFieldsAction(final RESTfulAction pAction,
+                                      final HttpServletRequest pRequest,
+                                      final HttpServletResponse pResponse)
+      throws ParseException, IOException {
+
+    // find user defined separator or use default one
+    String seprator = pRequest.getParameter(PARAM_SEPARATOR);
+    if (seprator == null || seprator.length() == 0) {
+      seprator = SPECIAL_SEPARATOR_PIPE;
+    }
+
+    // perform typical search
+    final List<Hit> results =
+        performSearch(pAction, pRequest, pResponse);
+
+    // find selected fields
+    final String paramSelect = pRequest.getParameter(PARAM_SELECT);
+    if (paramSelect == null || paramSelect.length() == 0) {
+      throw new RuntimeException("no such parameter called 'select', example " +
+          "usages - /service/find_*/q.xml?q=query&select=item_id, price");
+    }
+    final String[] fields = paramSelect.split(SEPARATOR_COMMA);
+
+    // accumulate search result
+    final Map<String, StringBuilder> fieldValueMap =
+        new HashMap<String, StringBuilder>();
+    for (final Hit hit : results) {
+      final GenericItem item = mRepositoryService.
+          getItem(hit.getId(), GenericItem.class);
+      // merge all fields value
+      for (String field : fields) {
+        field = field.trim();
+        final StringBuilder existingValue = fieldValueMap.get(field);
+        if (existingValue == null) {
+          final StringBuilder value = new StringBuilder();
+          final String fieldValue = item.getField(field);
+          if (fieldValue != null) {
+            value.append(fieldValue);
+          }
+          fieldValueMap.put(field, value);
+        } else {
+          final String fieldValue = item.getField(field);
+          if (fieldValue != null) {
+            existingValue.append(seprator).
+                          append(fieldValue);
+          }
+        }
+      }
+    }
+
+    // create a new generic item
+    final GenericItem genericItem = new GenericItem();
+
+    // convert string builder to normal string and add to
+    // the generic item object
+    for (final Map.Entry<String, StringBuilder> entry
+        : fieldValueMap.entrySet()) {
+      genericItem.addField(entry.getKey(), entry.getValue().toString());
+    }
+
+    // create response element to send out the response.
+    final ResponseElement responseElement =
+          new ResponseElement(ELEMENT_ITEM, genericItem);
+      generateResponse(true, pAction, pRequest, pResponse,
+                       responseElement, STATUS_OK_200);
   }
 
   private void handleFindRelatedItemsAction(final RESTfulAction pAction,
@@ -911,6 +993,52 @@ public class RESTfulControllerImpl implements RESTfulController {
                                 final HttpServletRequest pRequest,
                                 final HttpServletResponse pResponse)
       throws ParseException, IOException {
+
+    // perform search operation
+    final PaginatedList<Hit> results =
+        performSearch(pAction, pRequest, pResponse);
+
+    // repopulate search result with formattable object
+    final Object object;
+    if (results != null && !results.isEmpty()) {
+      final HitListObject hitListObject = new HitListObject(results);
+      // if user defined "select" parameter, it will return list of reference
+      final String paramSelect = pRequest.getParameter(PARAM_SELECT);
+      if (paramSelect != null) {
+        final String[] fields = paramSelect.split(SEPARATOR_COMMA);
+        for(final String field : fields) {
+          hitListObject.setRepositoryService(mRepositoryService);
+          hitListObject.addSelectableField(field.trim());
+        }
+      }
+      object = hitListObject;
+    } else {
+      object = EmptyObject.EMPTY;
+    }
+
+    // Build response element to send out response in user defined format.
+    final ResponseElement responseElement =
+        new ResponseElement(ELEMENT_ITEMS, object);
+    // Add pagination hits
+    final ResponseElement maximumRows =
+        new ResponseElement(ELEMENT_MAX_ROWS, results.size());
+    // Add probable page number
+    final ResponseElement probablePages =
+        new ResponseElement(ELEMENT_PAGES_COUNT, results.getPageCount());
+
+    // add to the top response element
+    responseElement.addResponseElement(maximumRows).
+                    addResponseElement(probablePages);
+
+    // Generate response
+    generateResponse(true, pAction, pRequest, pResponse,
+                     responseElement, STATUS_OK_200);
+  }
+
+  private PaginatedList<Hit> performSearch(final RESTfulAction pAction,
+                                           final HttpServletRequest pRequest,
+                                           final HttpServletResponse pResponse)
+      throws ParseException {
     // Find query expression
     final String parameter = pAction.getParameter();
     final String queryString = pRequest.getParameter(parameter);
@@ -974,31 +1102,7 @@ public class RESTfulControllerImpl implements RESTfulController {
     }
 
     // perform lucene based search
-    final PaginatedList<Hit> results =
-        mRepositoryService.getItemsByQuery(query);
-    final Object object;
-    if (results != null && !results.isEmpty()) {
-      object = new HitListObject(results);
-    } else {
-      object = EmptyObject.EMPTY;
-    }
-    // Response element.
-    final ResponseElement responseElement =
-        new ResponseElement(ELEMENT_ITEMS, object);
-    // Add pagination hits
-    final ResponseElement maximumRows =
-        new ResponseElement(ELEMENT_MAX_ROWS, results.size());
-    // Add probable page number
-    final ResponseElement probablePages =
-        new ResponseElement(ELEMENT_PAGES_COUNT, results.getPageCount());
-
-    // add to the top response element
-    responseElement.addResponseElement(maximumRows).
-                    addResponseElement(probablePages);
-
-    // Generate response
-    generateResponse(true, pAction, pRequest, pResponse,
-                     responseElement, STATUS_OK_200);
+    return mRepositoryService.getItemsByQuery(query);
   }
 
   /**

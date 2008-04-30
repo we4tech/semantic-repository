@@ -58,7 +58,7 @@ public class WebServiceClientLiveTest extends BaseTestCase {
   private static final String XML_MIME = "text/xml";
 
   private WebServiceManagerInterface mWebServiceManager =
-      new WebServiceManager("http://localhost:8080/repository/rest/");
+      new WebServiceManager("http://localhost:1990/rest/");
   private RepositoryService mRepositoryService;
   private UserService mUserService;
 

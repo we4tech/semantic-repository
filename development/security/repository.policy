@@ -17,6 +17,8 @@ grant  Principal com.ideabase.repository.core.auth.RepositoryUserPrincipal "admi
   permission com.ideabase.repository.core.auth.URLPermission
   ".+/find/.+", "GET";
   permission com.ideabase.repository.core.auth.URLPermission
+  ".+/find_fields/.+", "GET";
+  permission com.ideabase.repository.core.auth.URLPermission
   ".+/add-related-items/.+", "POST";
   permission com.ideabase.repository.core.auth.URLPermission
   ".+/delete-related-items/.+", "POST";
