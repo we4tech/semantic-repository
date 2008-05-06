@@ -38,11 +38,13 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
 
 import com.ideabase.repository.core.search.RepositoryItemSearch;
+import com.ideabase.repository.core.index.NumberSortComparator;
 import com.ideabase.repository.common.object.Hit;
 import com.ideabase.repository.common.object.ObjectBase;
 import com.ideabase.repository.common.object.PaginatedList;
 import com.ideabase.repository.common.object.HitTransformer;
 import com.ideabase.repository.common.Query;
+import com.ideabase.repository.common.CommonConstants;
 import com.ideabase.repository.common.exception.ServiceException;
 
 import java.util.*;
@@ -71,6 +73,12 @@ public class RepositoryItemSearchImpl extends LuceneSearchSupport
    * Field for index order.
    */
   private static final String SORT_INDEXORDERED = "indexorder";
+
+  /**
+   * Support sorting option for number fields.
+   */
+  private final NumberSortComparator mNumberSortComparator =
+      new NumberSortComparator();
 
   /**
    * {@inheritDoc}
@@ -126,7 +134,14 @@ public class RepositoryItemSearchImpl extends LuceneSearchSupport
         if (LOG.isDebugEnabled()) {
           LOG.debug("Applying sort field - " + key);
         }
-        sortFields.add(new SortField(key, decending.booleanValue()));
+        if (key.startsWith(CommonConstants.FIELD_PREFIX_PRICE)
+            || key.endsWith(CommonConstants.FIELD_SUFFIX_ID)
+            || key.endsWith(CommonConstants.FIELD_SUFFIX_DATE)) {
+          sortFields.add(new SortField(
+              key, mNumberSortComparator, decending.booleanValue()));
+        } else {
+          sortFields.add(new SortField(key, decending.booleanValue()));
+        }
       }
     }
     if (!sortFields.isEmpty()) {
