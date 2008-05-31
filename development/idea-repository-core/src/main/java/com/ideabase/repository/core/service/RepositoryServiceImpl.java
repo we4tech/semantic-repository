@@ -215,17 +215,11 @@ public class RepositoryServiceImpl implements RepositoryService {
     final String indexRepository = pRepositoryItem.getIndexRepository();
     if (indexRepository == null
         || indexRepository.equalsIgnoreCase(KEY_DEFAULT)) {
-      synchronized (mDefaultRepositoryItemIndex) {
-        mDefaultRepositoryItemIndex.addDocument(pRepositoryItem.getDocument());
-        mDefaultRepositoryItemIndex.optimize();
-      }
+      mDefaultRepositoryItemIndex.addDocument(pRepositoryItem.getDocument());
     } else {
       final RepositoryItemIndex indexer =
           mRepositoryItemIndexMap.get(indexRepository.toLowerCase());
-      synchronized (indexer) {
-        indexer.addDocument(pRepositoryItem.getDocument());
-        indexer.optimize();
-      }
+      indexer.addDocument(pRepositoryItem.getDocument());
     }
   }
 
@@ -240,17 +234,11 @@ public class RepositoryServiceImpl implements RepositoryService {
     final String indexRepository = pRepositoryItem.getIndexRepository();
     if (indexRepository == null
         || indexRepository.equalsIgnoreCase(KEY_DEFAULT)) {
-      synchronized (mDefaultRepositoryItemIndex) {
-        mDefaultRepositoryItemIndex.updateDocument(idTerm, pRepositoryItem.getDocument());
-        mDefaultRepositoryItemIndex.optimize();
-      }
+      mDefaultRepositoryItemIndex.updateDocument(idTerm, pRepositoryItem.getDocument());
     } else {
       final RepositoryItemIndex indexer =
           mRepositoryItemIndexMap.get(indexRepository.toLowerCase());
-      synchronized (indexer) {
-        indexer.updateDocument(idTerm, pRepositoryItem.getDocument());
-        indexer.optimize();
-      }
+      indexer.updateDocument(idTerm, pRepositoryItem.getDocument());
     }
   }
 
@@ -410,15 +398,11 @@ public class RepositoryServiceImpl implements RepositoryService {
                                  String.valueOf(pRepositoryItemId));
     if (pIndexRepository == null
         || pIndexRepository.equalsIgnoreCase(KEY_DEFAULT)) {
-      synchronized (mDefaultRepositoryItemIndex) {
-        mDefaultRepositoryItemIndex.deleteDocument(idTerm);
-      }
+      mDefaultRepositoryItemIndex.deleteDocument(idTerm);
     } else {
       final RepositoryItemIndex indexer =
           mRepositoryItemIndexMap.get(pIndexRepository.toLowerCase());
-      synchronized (indexer) {
-        indexer.deleteDocument(idTerm);
-      }
+      indexer.deleteDocument(idTerm);
     }
   }
 
@@ -595,6 +579,17 @@ public class RepositoryServiceImpl implements RepositoryService {
         : mRepositoryItemIndexMap.entrySet()) {
       LOG.info("Invoking optimizer for index repository - " + entry.getKey());
       entry.getValue().optimize();
+    }
+  }
+
+  public void optimizeSpecificIndex(final String pIndexName) {
+    final RepositoryItemIndex index =
+        mRepositoryItemIndexMap.get(pIndexName.toLowerCase());
+    if (index != null) {
+      index.optimize();
+    } else {
+      throw new RuntimeException(
+          "no such repository index - " + pIndexName.toLowerCase());
     }
   }
 

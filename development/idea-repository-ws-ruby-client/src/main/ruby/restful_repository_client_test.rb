@@ -3,13 +3,13 @@
 #
 
 $:.unshift File.join(File.dirname(__FILE__),'..','lib')
-
+REPOSITORY_URL = "http://localhost:1990/rest/service/"
 require 'test/unit'
 require 'restful_repository.rb'
 require "date"
 
 class TestRestful_repository_client_test < Test::Unit::TestCase
-  
+
   def setup
     @m_client = RESTfulRepository::Client.new
   end
@@ -19,14 +19,14 @@ class TestRestful_repository_client_test < Test::Unit::TestCase
 
   # invoke - RESTfulRepository::Client.login
   # required - true
-  def _test_login
+  def test_login
     login_state = authenticate_user
     assert_equal true, login_state, "Failed to authenticate user"
   end
 
   def authenticate_user
-    user = "we4tech3"
-    password = "hasankhan"
+    user = "mac1"
+    password = "mac1"
     @m_client.login(user, password)
   end
 
@@ -192,7 +192,7 @@ class TestRestful_repository_client_test < Test::Unit::TestCase
 
   # invoke - RESTfulRepository::Client.delete_related_items
   # required - true
-  def test_delete_related_items
+  def _test_delete_related_items
     authenticate_user
     item = RESTfulRepository::Item.new
     item.id = 2266

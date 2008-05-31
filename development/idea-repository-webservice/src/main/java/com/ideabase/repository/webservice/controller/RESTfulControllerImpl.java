@@ -173,6 +173,13 @@ public class RESTfulControllerImpl implements RESTfulController {
 
   public static final String KEY_DELETE_SUCCESSFUL =
                              KEY_SUCCESS_PREFIX + "action.delete";
+
+  public static final String KEY_OPTIMIZE_SUCCESSFUL =
+                             KEY_SUCCESS_PREFIX + "action.optimized";
+
+  public static final String KEY_OPTIMIZE_ERROR =
+                             KEY_ERROR_PREFIX + "action.optimized";
+
   /**
    * Send response status 404, it means resource doesn't exists.
    */
@@ -256,6 +263,11 @@ public class RESTfulControllerImpl implements RESTfulController {
    * Update request for updating an existing item.
    */
   private static final String ACTION_UPDATE = "update";
+
+  /**
+   * Optimize index for the specified repository
+   */
+  private static final String ACTION_OPTIMIZE = "optimize";
 
   /**
    * Find fields requesst for retrieving fields from a search set,
@@ -514,9 +526,40 @@ public class RESTfulControllerImpl implements RESTfulController {
     else if (ACTION_FIND_FIELDS.equals(pAction.getAction())) {
       handleFindFieldsAction(pAction, pRequest, pResponse);
     }
+    // handle optimize action
+    else if (ACTION_OPTIMIZE.equals(pAction.getAction())) {
+      handleOptimizeAction(pAction, pRequest, pResponse);
+    }
     // handle unknown action
     else {
       invalidActionResponse(pAction, KEY_INVALID_ACTION, pResponse);
+    }
+  }
+
+  private void handleOptimizeAction(final RESTfulAction pAction,
+                                    final HttpServletRequest pRequest,
+                                    final HttpServletResponse pResponse)
+      throws IOException {
+    final String repositoryName = pAction.getParameter();
+
+    if (repositoryName != null && repositoryName.length() > 0) {
+      mRepositoryService.optimizeSpecificIndex(repositoryName);
+      final String message =
+          mMessageAccessor.getMessage(KEY_OPTIMIZE_SUCCESSFUL);
+      final ResponseElement responseElement =
+          new ResponseElement(ELEMENT_MESSAGE, message);
+      generateResponse(
+          true, pAction, pRequest, pResponse, responseElement, STATUS_OK_200);
+      LOG.info("optimizing repository - " + repositoryName);
+    } else {
+
+      final String message = mMessageAccessor.getMessage(KEY_OPTIMIZE_ERROR);
+      final ResponseElement responseElement =
+          new ResponseElement(ELEMENT_MESSAGE, message);
+      generateResponse(
+          true, pAction, pRequest, pResponse,
+          responseElement, STATUS_NOT_FOUND_404);
+      LOG.info("failed to optimize repository - " + repositoryName);
     }
   }
 

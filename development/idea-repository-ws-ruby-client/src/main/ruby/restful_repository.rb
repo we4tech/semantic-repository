@@ -1,16 +1,26 @@
 require "net/http"
 require "uri"
 require "rexml/document"
+require 'date'
 
 module RESTfulRepository
 
-  # Base repository item.
+  # base repository item.
   class Item
     attr_reader :id, :title, :created_on, :last_updated_on, :fields, :uri, :target_class
+    attr_reader :debug_enabled
+    attr_accessor :score
+
+    def debug(p_msg)
+      if @debug_enabled
+        puts "debug - #{p_msg}"
+      end
+    end
 
     def initialize
       @fields = {}
       @related_items = {}
+      @score = 0
     end
 
     def id=(p_id)
@@ -83,7 +93,7 @@ module RESTfulRepository
 
     def [](p_key)
       key = p_key.to_s
-      puts key.to_s
+      debug key.to_s
       if @fields.has_key?(key)
         @fields[key]
       else
@@ -97,6 +107,16 @@ module RESTfulRepository
 
     def size
       @fields.size
+    end
+
+    def merged_text
+      merged_content = "#{id} #{title}"
+      unless @fields.nil?
+        @fields.each do |e_key, e_value|
+          merged_content << " #{e_key} #{e_value}"
+        end
+      end
+      return merged_content
     end
 
     def each
@@ -114,18 +134,28 @@ module RESTfulRepository
         end
       end
       s += "\trelated_items : #{@related_items}\r\n"
-      s += "\ttarget_class : #{@target_class}\r\n"
+      s += "\ttarget_class : #{@target_class}\r\n" 
       s += "}"
     end
   end
 
+  # search result object
   class SearchResult
     attr_reader :max_rows, :page_count
+    attr_reader :debug_enabled
+    attr_accessor :state
+
+    def debug(p_msg)
+      if @debug_enabled
+        puts "debug - #{p_msg}"
+      end
+    end
 
     def initialize
       @items = []
       @max_rows = 0
       @page_count = 0
+      @state = true
     end
 
     def max_rows=(p_max_rows)
@@ -136,8 +166,8 @@ module RESTfulRepository
       @page_count = p_page_count
     end
 
-    def <<(p_item_id)
-      @items.push(p_item_id)
+    def add_item(p_item)
+      @items.push(p_item)
     end
 
     def each
@@ -150,10 +180,14 @@ module RESTfulRepository
       @items
     end
 
+    def empty?
+      @items.empty?
+    end
+
     def to_s
       s = "{items: "
       each {|item|
-        s += item +", "
+        s += "#{item.inspect}, "
       }
       s += "page-count: #{@page_count}, max-rows: #{@max_rows}"
       s += "}"
@@ -161,8 +195,21 @@ module RESTfulRepository
     end
   end
 
+  # respository restful client
   class Client
 
+    attr_reader :debug_enabled
+
+    def set_debug(p_state)
+      @debug_enabled = p_state  
+    end
+
+    def debug(p_msg)
+      if @debug_enabled
+        puts "debug - #{p_msg}"
+      end
+    end
+    
     # constants for header and parameter name
     HEADER_SET_COOKIE = "set-cookie"
     HEADER_COOKIE = "cookie"
@@ -191,7 +238,7 @@ module RESTfulRepository
     PARAM_LOAD_RELATED_ITEMS = "load_related_items"
 
     # repository restful web service uri
-    @@m_service_url = URI.parse("http://localhost:8080/repository/rest/service/")
+    @@m_service_url = URI.parse(REPOSITORY_URL)
     # request and response preferred format.
     @@m_content_format = "xml"
 
@@ -201,6 +248,8 @@ module RESTfulRepository
     @@m_service_get = "get/"
     # content retrieval related find service uri
     @@m_service_find = "find/query"
+    # find fields from the search result
+    @@m_service_find_fields = "find_fields/query"
     # object update service uri
     @@m_service_update = "update/item"
     # object save service uri
@@ -226,13 +275,15 @@ module RESTfulRepository
 
     private
     def build_item(p_xml_content)
-      puts p_xml_content
+      debug(p_xml_content)
       document = REXML::Document.new(p_xml_content)
       root_element = document.root
       response_state = root_element.attributes[ATTR_STATE]
+      debug("state - #{response_state}")
+      
       # successfull request
       if response_state
-        puts("Item retrieved from repository")
+        debug("Item retrieved from repository")
         root_element.each_element do |item|
           if item.name == ELE_ITEM
             g_item = Item.new
@@ -271,10 +322,11 @@ module RESTfulRepository
           end
         end
       end
+      return false
     end
 
     def state_true?(p_item, p_response)
-      puts "Respose - #{p_response}"
+      debug "Respose - #{p_response}"
       document = REXML::Document.new(p_response)
       root = document.root
       state = root.attributes[ATTR_STATE]
@@ -292,36 +344,34 @@ module RESTfulRepository
       return response_state
     end
 
-    def post_request(p_service_uri, p_request, *p_header_exclude)
-      puts "URI - #{p_service_uri}, request - #{p_request}"
-      @response = Net::HTTP.start(@@m_service_url.hosts,
+    def post_request(p_service_uri, p_request)
+      debug "URI - #{p_service_uri}, request - #{p_request}"
+      @response = Net::HTTP.start(@@m_service_url.host,
                                   @@m_service_url.port) {|http|
         headers = {}
-        if p_header_exclude.nil? or p_header_exclude == false
-          unless @@m_cookies.nil?
-            headers[HEADER_COOKIE] = @@m_cookies
-          end
+        unless @@m_cookies.nil?
+          headers[HEADER_COOKIE] = @@m_cookies
         end
-        http.post(p_service_uri, p_request, headers)
+        http.post(p_service_uri, URI.escape(p_request), headers)
       }
     end
 
     def delete_request(p_service_uri)
-      puts "URI - #{p_service_uri}"
+      debug "URI - #{p_service_uri}"
       raise "No cookies exists" if @@m_cookies.nil?
-      @response = Net::HTTP.start(@@m_service_url.hosts,
+      @response = Net::HTTP.start(@@m_service_url.host,
                                   @@m_service_url.port) {|http|
         http.delete(p_service_uri, {HEADER_COOKIE => @@m_cookies})
       }
     end
 
     def get_request(p_service_uri)
-      puts "URI - #{p_service_uri}"
-      raise "No cookies exists" if @@m_cookies.nil?
-      @response = Net::HTTP.start(@@m_service_url.hosts,
-                                  @@m_service_url.port) {|http|
-        http.get(p_service_uri, {HEADER_COOKIE => @@m_cookies})
+      debug "URI - #{p_service_uri}"
+      response = Net::HTTP.start(@@m_service_url.host,
+                                 @@m_service_url.port) {|http|
+        http.get(p_service_uri)
       }
+      return response
     end
 
     # build xml from the item object
@@ -377,8 +427,27 @@ module RESTfulRepository
       p_root.each_element {|node|
         case node.name
           when ELE_ITEMS
-            node.each_element {|item|
-              p_search_result << item.text[/\d+/]
+            node.each_element {|e_item_element|
+              item_id = (e_item_element.attributes["uri"])[/\d+/]
+              score = e_item_element.attributes["score"]
+
+              item = Item.new
+              item.id = item_id
+              item.score = score
+
+              # find item fields
+              e_item_element.each_element do |e_item_childs|
+                case e_item_childs.name
+                when ELE_FIELDS
+                  e_item_childs.each_element do |e_field|
+                    name = e_field.attributes[ATTR_NAME]
+                    value = e_field.text
+                    item << {name => value}
+                  end
+                end
+              end
+
+              p_search_result.add_item(item)
             }
           when ELE_PAGE_COUNT
             p_search_result.page_count = node.text.to_i
@@ -397,22 +466,22 @@ module RESTfulRepository
     def login(p_user, p_password)
       params = "?user=#{p_user}&password=#{p_password}"
       service_uri = @@m_service_url.path + @@m_service_auth + params
-      @response = Net::HTTP.start(@@m_service_url.hosts,
+      response = Net::HTTP.start(@@m_service_url.host,
           @@m_service_url.port) {|http|
         http.get(service_uri)
       }
-      @@m_cookies = @response.header[HEADER_SET_COOKIE]
-      state_true?(nil, @response.body)
+      @@m_cookies = response.header[HEADER_SET_COOKIE]
+      [state_true?(nil, response.body), response.body.match(/<authToken><\!\[CDATA\[(.+)\]\]><\/authToken>/)[1]]
     end
 
     # retrieve a specific item by the given item id from the reposotry.
-    def get(p_item_id, p_args)
-      service_uri = "#{@@m_service_url.path}#{@@m_service_get}#{p_item_id}.#{@@m_content_format}"
+    def get(pAuthToken, p_item_id, p_args)
+      service_uri = "#{@@m_service_url.path}#{@@m_service_get}#{p_item_id}.#{@@m_content_format}?authToken=#{pAuthToken}"
 
       # verify user intention about related items, if :related_items flag is set
       # load all related items
       if p_args.nil? == false and p_args[:related_items] == true
-        service_uri += "?#{PARAM_LOAD_RELATED_ITEMS}=true"
+        service_uri += "&#{PARAM_LOAD_RELATED_ITEMS}=true"
 
         # verify whether user has set any offset
         offset = p_args[:offset]
@@ -440,23 +509,25 @@ module RESTfulRepository
           service_uri += "&relation_types=#{relation_types}"
         end
       end
-      puts service_uri
-      raise "No cookies exists" if @@m_cookies.nil?
-      @response = Net::HTTP.start(@@m_service_url.hosts,
+      debug service_uri
+      response = Net::HTTP.start(@@m_service_url.host,
           @@m_service_url.port) {|http|
         http.get(service_uri, {HEADER_COOKIE => @@m_cookies})
       }
-      begin
-        xml_content = @response.body
-        return build_item(xml_content)
-      end
+      xml_content = response.body
+      built_item = build_item(xml_content)
+      debug("built item - #{built_item}")
+      return built_item
     end
 
-    # perform search on the repository
-    def find(p_args)
+    # perform field search and return the list of avaiable fields
+    def find_fields(pAuthToken, p_args)
       query = p_args[:query]
       max = p_args[:max]
       offset = p_args[:offset]
+      sort_by = p_args[:sort_by]
+      select = p_args[:select]
+      separator = p_args[:separator] || "|"
 
       # verify the arguments
       raise "NO query defined" if query.nil?
@@ -469,11 +540,69 @@ module RESTfulRepository
       end
 
       # build service uri
-      params = "query=#{query}&offset=#{offset}&max=#{max}"
-      service_uri = "#{@@m_service_url.path}#{@@m_service_find}.#{@@m_content_format}?" + params
+      params = "authToken=#{pAuthToken}&query=#{query}&offset=#{offset}&max=#{max}&separator=#{separator}"
+
+      # add sort by related prameters
+      if !sort_by.nil?
+        params << "&sortby=#{sort_by[0]}&order=#{sort_by[1].to_s}"
+      end
+
+      # find selectable fields
+      if !select.nil?
+        params << "&select=#{URI.escape(select.collect {|e_field| e_field.to_s}.join(", "))}"
+      end
+
+      service_uri = "#{@@m_service_url.path}#{@@m_service_find_fields}.#{@@m_content_format}?#{params}"
+
+      # send service requests
+      debug service_uri
+      response = Net::HTTP.start(@@m_service_url.host,
+          @@m_service_url.port) {|http|
+        http.get(service_uri, {HEADER_COOKIE => @@m_cookies})
+      }
+      
+      # constructor result
+      xml_content = response.body
+      built_item = build_item(xml_content)
+      debug("built item - #{built_item}")
+      return built_item
+    end
+
+    # perform search on the repository
+    def find(pAuthToken, p_args)
+      query = p_args[:query]
+      max = p_args[:max]
+      offset = p_args[:offset]
+      sort_by = p_args[:sort_by]
+      select = p_args[:select]
+
+      # verify the arguments
+      raise "NO query defined" if query.nil?
+      query = URI.escape(query)
+      if max.nil?
+        max = 100020
+      end
+      if offset.nil?
+        offset = 0
+      end
+
+      # build service uri
+      params = "authToken=#{pAuthToken}&query=#{query}&offset=#{offset}&max=#{max}"
+
+      # add sort by related prameters
+      if !sort_by.nil?
+        params << "&sortby=#{sort_by[0]}&order=#{sort_by[1].to_s}"
+      end
+
+      # find selectable fields
+      if !select.nil? && !select.empty?
+        params << "&select=#{URI.escape(select.collect {|e_field| e_field.to_s}.join(", "))}"
+      end
+
+      service_uri = "#{@@m_service_url.path}#{@@m_service_find}.#{@@m_content_format}?#{params}"
       search_result = SearchResult.new
-      @response = get_request(service_uri)
-      state_true?(nil, @response.body) do |root_element|
+      response = get_request(service_uri)
+      search_result.state = state_true?(nil, response.body) do |root_element|
         build_search_result(search_result, root_element)
       end
       search_result
@@ -481,22 +610,14 @@ module RESTfulRepository
 
     # store an item to the repository
     # return true if service request is successful
-    def save(p_item)
+    def save(pAuthToken, p_item)
       # build request string
       request = "<#{ELE_REQUEST}>\n"
-
-      # set target class if it is defined
-      unless p_item.target_class.nil?
-        request += "<#{ELE_TARGET_CLASS}>"
-        request += p_item.target_class
-        request += "</#{ELE_TARGET_CLASS}>"
-      end
-
       request += build_xml(p_item)
       request += "</#{ELE_REQUEST}>\n"
 
       # build service uri
-      service_uri = "#{@@m_service_url.path}#{@@m_service_update}.#{@@m_content_format}"
+      service_uri = "#{@@m_service_url.path}#{@@m_service_update}.#{@@m_content_format}?authToken=#{pAuthToken}"
 
       # if no user id is defined treat it as a new object.
       if p_item.id.nil?
@@ -508,13 +629,13 @@ module RESTfulRepository
     end
 
     # remove an existing repository item
-    def delete(p_item_id)
-      service_uri = "#{@@m_service_url.path}#{@@m_service_delete}#{p_item_id}.#{@@m_content_format}"
+    def delete(pAuthToken, p_item_id)
+      service_uri = "#{@@m_service_url.path}#{@@m_service_delete}#{p_item_id}.#{@@m_content_format}?authToken=#{pAuthToken}"
       state_true?(nil, delete_request(service_uri).body)
     end
 
     # add related items
-    def add_related_items(p_item)
+    def add_related_items(pAuthToken, p_item)
       # build request string
       request = "<#{ELE_REQUEST}>\n"
       request += build_xml(p_item)
@@ -524,11 +645,11 @@ module RESTfulRepository
       service_uri = "#{@@m_service_url.path}#{@@m_service_add_related_items}.#{@@m_content_format}"
 
       # send http request
-      state_true?(p_item, post_request(service_uri, "item=#{request}").body)
+      state_true?(p_item, post_request(service_uri, "authToken=#{pAuthToken}&item=#{request}").body)
     end
 
     # add related items
-    def delete_related_items(p_item)
+    def delete_related_items(pAuthToken, p_item)
       # build request string
       request = "<#{ELE_REQUEST}>\n"
       request += build_xml(p_item)
@@ -538,21 +659,21 @@ module RESTfulRepository
       service_uri = "#{@@m_service_url.path}#{@@m_service_delete_related_items}.#{@@m_content_format}"
 
       # send http request
-      state_true?(p_item, post_request(service_uri, "item=#{request}").body)
+      state_true?(p_item, post_request(service_uri, "authToken=#{pAuthToken}&item=#{request}").body)
     end
 
     # find related items from a specific item
-    def find_related_items(p_args)
+    def find_related_items(pAuthToken, p_args)
       relation_type = p_args[:relation_type]
       item_id = p_args[:item_id]
       offset = p_args[:offset]
       max = p_args[:max]
 
       unless relation_type.nil?
-        service_uri = "#{@@m_service_url.path}#{@@m_service_find_related_items}#{relation_type}&#{item_id}.#{@@m_content_format}"
+        service_uri = "#{@@m_service_url.path}#{@@m_service_find_related_items}#{relation_type}&#{item_id}.#{@@m_content_format}?authToken=#{pAuthToken}"
         params = nil
         unless offset.nil?
-          params = "?offset=#{offset}"
+          params = "&offset=#{offset}"
         end
         unless max.nil?
           if params.nil?
@@ -581,7 +702,7 @@ module RESTfulRepository
       service_uri = "#{@@m_service_url.path}#{@@m_service_register}.#{@@m_content_format}"
 
       # send http request
-      state_true?(p_item, post_request(service_uri, "user=#{request}", true).body) {|root|
+      state_true?(p_item, post_request(service_uri, "user=#{request}").body) {|root|
         root.each_element do |node|
           if node.name == ELE_ITEM
             return true, node.text[/\d+/]

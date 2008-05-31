@@ -226,6 +226,12 @@ public interface RepositoryService {
   void optimizeIndex();
 
   /**
+   * Optimize a specific index
+   * @param pIndexName index repository name.
+   */
+  void optimizeSpecificIndex(final String pIndexName);
+
+  /**
    * Total number of available items on the repository
    * @return
    */

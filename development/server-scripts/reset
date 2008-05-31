@@ -1,0 +1,31 @@
+#!/usr/local/bin/ruby
+# $Id$
+# *****************************************************************************
+# Copyright (C) 2005 - 2007 somewhere in .Net ltd.
+# All Rights Reserved.  No use, copying or distribution of this
+# work may be made except in accordance with a valid license
+# agreement from somewhere in .Net LTD.  This notice must be included on
+# all copies, modifications and derivatives of this work.
+# *****************************************************************************
+# $LastChangedBy$
+# $LastChangedDate$
+# $LastChangedRevision$
+# *****************************************************************************
+require 'rubygems'
+require 'mysql'
+
+# create database connection
+@connection = Mysql::new("localhost", "root", "", "repository_test")
+
+# remove all items and mapping information
+@connection.query("delete from item")
+@connection.query("delete from itemmapping")
+@connection.close
+
+puts "reset repository database."
+
+# remove index directory
+puts "removing all indexes." 
+index_dir = "/Users/nhmtanveerhossainkhanhasan/java-tmp/index"
+exec("rm -rf #{index_dir}/*")
+puts "done."

@@ -15,6 +15,8 @@
 package com.ideabase.repository.core.index.impl;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.springmodules.lucene.index.support.LuceneIndexSupport;
 import org.springmodules.lucene.index.factory.LuceneIndexReader;
@@ -36,11 +38,25 @@ public class RepositoryItemIndexImpl extends LuceneIndexSupport
       LogManager.getLogger(RepositoryItemIndexImpl.class);
 
   /**
+   * Executor service is used to process all same index related work in a
+   * queued manner. so the caller won't wait for the processing instead it
+   * will do it afterwords.
+   */
+  private final Executor mIndexTaskExecutor =
+      Executors.newSingleThreadExecutor();
+
+  /**
    * {@inheritDoc}
    * @param pDocument {@inheritDoc}
    */
   public void addDocument(final Document pDocument) {
-    getLuceneIndexTemplate().addDocument(pDocument);
+    mIndexTaskExecutor.execute(
+        new Runnable() {
+          public void run() {
+            getLuceneIndexTemplate().addDocument(pDocument);
+          }
+        }
+    );
   }
 
   /**
@@ -48,22 +64,40 @@ public class RepositoryItemIndexImpl extends LuceneIndexSupport
    */
   public void updateDocument(final Term pTerm,
                              final Document pDocument) {
-    this.deleteDocument(pTerm);
-    this.addDocument(pDocument);
+    mIndexTaskExecutor.execute(
+        new Runnable() {
+          public void run() {
+            getLuceneIndexTemplate().deleteDocuments(pTerm);
+            getLuceneIndexTemplate().addDocument(pDocument);
+          }
+        }
+    );
   }
 
   /**
    * {@inheritDoc}
    */
   public void deleteDocument(final Term pIdTerm) {
-    getLuceneIndexTemplate().deleteDocuments(pIdTerm);
+    mIndexTaskExecutor.execute(
+        new Runnable() {
+          public void run() {
+            getLuceneIndexTemplate().deleteDocuments(pIdTerm);
+          }
+        }
+    );
   }
 
   /**
    * {@inheritDoc}
    */
   public void optimize() {
-    getLuceneIndexTemplate().optimize();
+    mIndexTaskExecutor.execute(
+        new Runnable() {
+          public void run() {
+            getLuceneIndexTemplate().optimize();
+          }
+        }
+    );
   }
 
   public void deleteIndexFiles(final boolean pConfirmation) throws IOException {
