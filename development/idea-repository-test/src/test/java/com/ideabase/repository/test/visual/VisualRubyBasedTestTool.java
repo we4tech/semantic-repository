@@ -22,8 +22,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-import org.apache.bsf.BSFManager;
-import org.apache.bsf.BSFException;
+/*import org.apache.bsf.BSFManager;
+import org.apache.bsf.BSFException;*/
 
 /**
  * Initiate base environment and execute ruby script to access internal
@@ -36,7 +36,7 @@ public class VisualRubyBasedTestTool extends JFrame implements ActionListener {
   private static final String CMD_EXECUTE = "cmd_execute";
   private final JTextArea rubyScriptArea = new JTextArea("puts('write your script here')");
   private final JTextArea outputArea = new JTextArea("output");
-  private BSFManager bsfManager;
+//  private BSFManager bsfManager;
 
   public VisualRubyBasedTestTool() throws HeadlessException {
     super();
@@ -88,20 +88,20 @@ public class VisualRubyBasedTestTool extends JFrame implements ActionListener {
     baseTestCase.initiate();*/
 
     // execute ruby script
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        if (bsfManager == null) {
-          bsfManager = new BSFManager();
-          bsfManager.setClassLoader(getClass().getClassLoader());
-        }
-        try {
-          outputArea.setText(String.valueOf(bsfManager.
-              eval("ruby", "test", 0, 0, rubyScriptArea.getText())));
-        } catch (BSFException e) {
-          e.printStackTrace();
-        }
-      }
-    });
+//    SwingUtilities.invokeLater(new Runnable() {
+//      public void run() {
+//        if (bsfManager == null) {
+//          bsfManager = new BSFManager();
+//          bsfManager.setClassLoader(getClass().getClassLoader());
+//        }
+//        try {
+//          outputArea.setText(String.valueOf(bsfManager.
+//              eval("ruby", "test", 0, 0, rubyScriptArea.getText())));
+//        } catch (BSFException e) {
+//          e.printStackTrace();
+//        }
+//      }
+//    });
 
   }
 }
