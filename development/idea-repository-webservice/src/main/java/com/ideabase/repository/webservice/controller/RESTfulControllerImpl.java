@@ -603,10 +603,13 @@ public class RESTfulControllerImpl implements RESTfulController {
     for (final Hit hit : results) {
       final GenericItem item = mRepositoryService.
           getItem(hit.getId(), GenericItem.class);
-      for (final String fieldName : item.getFields().keySet()) {
-        if (!fields.contains(fieldName) && !exceptFields.contains(fieldName)) {
-          fields.add(fieldName);
-          genericItem.addField(fieldName, EMPTY_STRING);
+      for (final Map.Entry<String, String> entry : item.getFields().entrySet()) {
+        final String fieldName = entry.getKey();
+        if (entry.getValue() != null && entry.getValue().length() > 0) {
+          if (!fields.contains(fieldName) && !exceptFields.contains(fieldName)) {
+            fields.add(fieldName);
+            genericItem.addField(fieldName, EMPTY_STRING);
+          }
         }
       }
     }
