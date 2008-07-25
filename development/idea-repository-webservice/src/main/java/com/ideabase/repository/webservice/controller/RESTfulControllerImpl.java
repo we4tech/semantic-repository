@@ -276,6 +276,11 @@ public class RESTfulControllerImpl implements RESTfulController {
   private static final String ACTION_FIND_FIELDS = "find_fields";
 
   /**
+   * Find field names which, which are picked from the search result.
+   */
+  private static final String ACTION_FIND_FIELD_NAMES = "find_field_names";
+
+  /**
    * No string is set.
    */
   private static final String EMPTY_STRING = "";
@@ -526,6 +531,10 @@ public class RESTfulControllerImpl implements RESTfulController {
     else if (ACTION_FIND_FIELDS.equals(pAction.getAction())) {
       handleFindFieldsAction(pAction, pRequest, pResponse);
     }
+    // handle find filed names
+    else if (ACTION_FIND_FIELD_NAMES.equals(pAction.getAction())) {
+      handleFindFieldNamesAction(pAction, pRequest, pResponse);
+    }
     // handle optimize action
     else if (ACTION_OPTIMIZE.equals(pAction.getAction())) {
       handleOptimizeAction(pAction, pRequest, pResponse);
@@ -561,6 +570,52 @@ public class RESTfulControllerImpl implements RESTfulController {
           responseElement, STATUS_NOT_FOUND_404);
       LOG.info("failed to optimize repository - " + repositoryName);
     }
+  }
+
+  private void handleFindFieldNamesAction(final RESTfulAction pAction,
+                                          final HttpServletRequest pRequest,
+                                          final HttpServletResponse pResponse)
+      throws ParseException, IOException {
+
+    // find user defined separator or use default one
+    String seprator = pRequest.getParameter(PARAM_SEPARATOR);
+    if (seprator == null || seprator.length() == 0) {
+      seprator = SPECIAL_SEPARATOR_PIPE;
+    }
+
+    // perform typical search
+    final List<Hit> results =
+        performSearch(pAction, pRequest, pResponse);
+
+    // find selected fields
+    final String paramExcept = pRequest.getParameter(PARAM_EXCEPT);
+    final List<String> exceptFields = new ArrayList<String>();
+    if (paramExcept != null && paramExcept.length() > 0) {
+      final String[] exceptFieldsArray = paramExcept.split(SEPARATOR_COMMA);
+      for (final String field : exceptFieldsArray) {
+        exceptFields.add(field.trim());
+      }
+    }
+
+    // create a new generic item
+    final GenericItem genericItem = new GenericItem();
+    final List<String> fields = new ArrayList<String>();
+    for (final Hit hit : results) {
+      final GenericItem item = mRepositoryService.
+          getItem(hit.getId(), GenericItem.class);
+      for (final String fieldName : item.getFields().keySet()) {
+        if (!fields.contains(fieldName) && !exceptFields.contains(fieldName)) {
+          fields.add(fieldName);
+          genericItem.addField(fieldName, EMPTY_STRING);
+        }
+      }
+    }
+
+    // create response element to send out the response.
+    final ResponseElement responseElement =
+          new ResponseElement(ELEMENT_ITEM, genericItem);
+      generateResponse(true, pAction, pRequest, pResponse,
+                       responseElement, STATUS_OK_200);
   }
 
   private void handleFindFieldsAction(final RESTfulAction pAction,

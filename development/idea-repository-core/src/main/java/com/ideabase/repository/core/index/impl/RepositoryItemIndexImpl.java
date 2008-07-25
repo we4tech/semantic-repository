@@ -17,6 +17,7 @@ package com.ideabase.repository.core.index.impl;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.Collection;
 
 import org.springmodules.lucene.index.support.LuceneIndexSupport;
 import org.springmodules.lucene.index.factory.LuceneIndexReader;
@@ -24,6 +25,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermDocs;
+import org.apache.lucene.index.TermEnum;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import com.ideabase.repository.core.index.RepositoryItemIndex;
 

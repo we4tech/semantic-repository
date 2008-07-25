@@ -29,7 +29,12 @@ public class NumberSortComparator extends SortComparator {
 
   protected Comparable getComparable(final String s) {
     if (s != null && s.length() > 10) {
-      return NumberTools.stringToLong(s);
+      try {
+        return NumberTools.stringToLong(s);
+      } catch (Exception e) {
+        mLog.warn("Invalid number format.", e);
+        return Long.parseLong(s);
+      }
     } else if (s != null && s.length() < 10) {
       return Long.parseLong(s);
     } else {

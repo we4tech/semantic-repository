@@ -52,8 +52,8 @@ public class ExtendedQueryParser extends QueryParser {
     final boolean includeUpper = pUpperTerm != null && !"*".equals(pUpperTerm);
     return new ConstantScoreRangeQuery(
         pField,
-        includeLower ? NumberTools.longToString(Integer.parseInt(pLowerTerm)) : "",
-        includeUpper ? NumberTools.longToString(Integer.parseInt(pUpperTerm)) : "*",
+        includeLower ? NumberTools.longToString(Long.parseLong(pLowerTerm)) : "",
+        includeUpper ? NumberTools.longToString(Long.parseLong(pUpperTerm)) : "*",
         includeLower, includeUpper) {
     };
   }

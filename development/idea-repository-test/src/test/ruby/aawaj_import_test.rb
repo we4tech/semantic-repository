@@ -26,7 +26,7 @@ REPOSITORY_VENDOR = "swiad"
 REPOSITORY_USER = "mac1"
 REPOSITORY_PASSWORD = "mac1"
 
-require '/Users/nhmtanveerhossainkhanhasan/projects/ideabase-products/semantic-repository/development/idea-repository-ws-ruby-client/src/main/ruby/restful_repository.rb'
+require '../../../../idea-repository-ws-ruby-client/src/main/ruby/restful_repository.rb'
 
 class AwaajImportTest < Test::Unit::TestCase
 

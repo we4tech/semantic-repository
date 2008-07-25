@@ -88,6 +88,11 @@ public class WebConstants {
   public static final String PARAM_SELECT = "select";
 
   /**
+   * Define except fileds during search asking for search result.
+   */
+  public static final String PARAM_EXCEPT = "except";
+
+  /**
    * Use user defined seprator
    */
   public static final String PARAM_SEPARATOR = "separator";

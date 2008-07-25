@@ -30,6 +30,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.jmock.core.MockObjectSupportTestCase;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * Base test case added common variable over protected scope.
  * @author <a href="mailto:hasan@somewherein.net">nhm tanveer hossain khan (hasan)</a>
@@ -39,8 +42,8 @@ public class BaseTestCase extends MockObjectSupportTestCase {
   /**
    * Base logger instance for all test child test cases.
    */
-  protected static final Logger LOG = LogManager.getLogger(BaseTestCase.class);
-  protected ApplicationContext mContext;
+  public static final Logger LOG = LogManager.getLogger(BaseTestCase.class);
+  public ApplicationContext mContext;
 
 
   /**
@@ -51,6 +54,10 @@ public class BaseTestCase extends MockObjectSupportTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+    initiate();
+  }
+
+  public void initiate() {
     // initiate spring context
     mContext = new ClassPathXmlApplicationContext(new String[] {
         "applicationContext.xml"

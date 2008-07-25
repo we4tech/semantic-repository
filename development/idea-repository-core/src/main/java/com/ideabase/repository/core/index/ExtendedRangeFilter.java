@@ -39,8 +39,8 @@ public class ExtendedRangeFilter extends RangeFilter {
   private final  boolean mIncludeLower;
   private final boolean mIncludeUpper;
   private final boolean mNumberField;
-  private Integer mLowerTermNumber;
-  private Integer mUpperTermNumber;
+  private Long mLowerTermNumber;
+  private Long mUpperTermNumber;
 
   public ExtendedRangeFilter(final String pFieldName,
                              final String pLowerTerm, final String pUpperTerm,
@@ -53,12 +53,10 @@ public class ExtendedRangeFilter extends RangeFilter {
     mUpperTerm = pUpperTerm;
     mIncludeLower = pIncludeLower;
     mIncludeUpper = pIncludeUpper;
-    /// pFieldName.startsWith(CommonConstants.FIELD_PREFIX_PRICE)
-                   // || pFieldName.endsWith(CommonConstants.FIELD_SUFFIX_ID);
     mNumberField = false;
     if (mNumberField) {
-      mLowerTermNumber = Integer.valueOf(mLowerTerm);
-      mUpperTermNumber = Integer.valueOf(mUpperTerm);
+      mLowerTermNumber = Long.valueOf(mLowerTerm);
+      mUpperTermNumber = Long.valueOf(mUpperTerm);
     }
 
   }
@@ -85,12 +83,12 @@ public class ExtendedRangeFilter extends RangeFilter {
           System.out.println("Term- " + currentTerm);
           final boolean sameField = (currentTerm != null && currentTerm.field().equals(mFieldName));
           if (sameField) {
-            Integer valueNumber = 0;
+            Long valueNumber = 0L;
             String valueText = currentTerm.text();
             final boolean noLowerBound = !checkLower || mLowerTerm == null;
             final int compareResult;
             if (mNumberField) {
-              valueNumber = Integer.valueOf(valueText);
+              valueNumber = Long.valueOf(valueText);
               compareResult = valueNumber.compareTo(mLowerTermNumber);
               System.out.println("Compare -LN- " + valueNumber + " VS " + mLowerTermNumber + "=" + compareResult);
             } else {

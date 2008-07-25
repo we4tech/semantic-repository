@@ -95,7 +95,7 @@ public class GenericItem extends AbstractObjectBase implements VisitableObject {
             name.endsWith(FIELD_SUFFIX_DATE) ||
             name.endsWith(FIELD_SUFFIX_NUMBER)) {
           document.add(new Field(
-              pName, NumberTools.longToString(Integer.parseInt(pValue)),
+              pName, NumberTools.longToString(Long.parseLong(pValue)),
               Field.Store.NO, Field.Index.UN_TOKENIZED));
         } else if (name.endsWith(FIELD_SUFFIX_ID)) {
           document.add(new Field(pName, pValue,

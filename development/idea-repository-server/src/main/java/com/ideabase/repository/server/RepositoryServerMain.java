@@ -28,8 +28,10 @@ import java.io.File;
  * @author <a href="http://hasan.we4tech.com">nhm tanveer...(hasan)</a>
  */
 public class RepositoryServerMain {
-  private ApplicationContext mServerContext;
-  private RepositoryServer mRepositoryServer;
+  // this is intentionally kept public so that we can access from 3rd party
+  // scripting environment such as jruby
+  public RepositoryServer mRepositoryServer;
+  public ApplicationContext mServerContext;
 
   public RepositoryServerMain() {
     mServerContext = new ClassPathXmlApplicationContext(new String[] {
