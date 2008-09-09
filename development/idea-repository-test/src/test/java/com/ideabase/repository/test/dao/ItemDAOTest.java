@@ -29,12 +29,15 @@ import com.ideabase.repository.core.dao.ItemDAO;
 import com.ideabase.repository.core.dao.Item;
 import com.ideabase.repository.core.CoreServiceKey;
 
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.List;
+import java.io.ByteArrayInputStream;
 
 import org.jmock.Mock;
 import org.jmock.core.Stub;
 import org.jmock.core.Invocation;
+
+import javax.sql.DataSource;
 
 /**
  * Test Repository Data access object.
@@ -46,6 +49,7 @@ public class ItemDAOTest extends BaseTestCase {
   private static final String DOCUMENT_CONTENT = "Document content";
   private static final String DOCUMENT_NEW_TITLE = "Bang title";
   private ItemDAO mItemDAO;
+  private boolean mDontCleanup = false;
 
   @Override
   protected void setUp() throws Exception {
@@ -54,7 +58,7 @@ public class ItemDAOTest extends BaseTestCase {
         (ItemDAO) mContext.getBean(CoreServiceKey.ITEM_DAO);
     assertNotNull("ItemDAO is not configured properly, " +
                   "therefore returning null instance.", mItemDAO);
-    TestCaseDaoHelper.deleteAllItems(mItemDAO);
+//    TestCaseDaoHelper.deleteAllItems(mItemDAO);
   }
 
   /**
@@ -127,8 +131,74 @@ public class ItemDAOTest extends BaseTestCase {
                numItems == itemCount);
   }
 
+  /**
+   * Test unicoded text
+   */
+  public void testUnicodedText() {
+    final String unicodedText = "সাহায্য করুন কেউ";
+    final Item newItem = new Item.Builder()
+      .title(unicodedText)
+      .document("<fields><field name='abc'>" + unicodedText + "</field></fields>")
+      .build();
+    final Integer itemId = mItemDAO.createItem(newItem);
+    assertNotNull(itemId);
+
+    // retrieve the newly created item
+    final Item item = mItemDAO.findItem(itemId);
+    assertNotNull(item);
+    assertEquals(item.getTitle(), unicodedText);
+    System.out.println("Item - " + item);
+
+    // find newly created item by the unicode text
+    final List<Item> items =
+      mItemDAO.findItems(new Item.Builder().title(unicodedText).build(), 0, 1);
+    mDontCleanup = true;
+  }
+
+  public void _testJdbcConnection() throws SQLException, ClassNotFoundException {
+    mDontCleanup = true;
+    final String unicodedText = "সাহায্য করুন কেউ";
+    final DataSource dataSource = (DataSource) mContext.getBean("dataSource");
+    final PreparedStatement statement = dataSource.getConnection().prepareStatement(
+      new StringBuilder().append("INSERT INTO ").append("item")
+      .append(" (title, document, createdOn, lastUpdatedOn, indexRepository)")
+      .append(" VALUES(?, ?, ?, ?, ?)").toString());
+//    statement.setBinaryStream(1, new ByteArrayInputStream(unicodedText.getBytes()), unicodedText.getBytes().length);
+    statement.setString(1, unicodedText);
+    statement.setString(2, "<fields><field name='word'><![CDATA[খান]]></field></fields>");
+    statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+    statement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+    statement.setString(5, "default");
+    assertEquals(1, statement.executeUpdate());
+  }
+
+  public void _testUnicodeText2() throws ClassNotFoundException, SQLException {
+    final String unicodedText = "সাহায্য করুন কেউ";
+    Class.forName("com.mysql.jdbc.Driver");
+    final Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ads_test_somewhereinads_net?jdbcCompliantTruncation=false", "root", "");
+    final PreparedStatement statement = connection.prepareStatement("" +
+      "INSERT INTO items" +
+      "  (name, description, price, user_id, category_id, created_at, category_tree_ref, url, status, location_id)" +
+      "VALUES " +
+      "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    statement.setString(1, unicodedText);
+    statement.setBinaryStream(2, new ByteArrayInputStream(unicodedText.getBytes()), unicodedText.getBytes().length);
+    statement.setDouble(3, 100d);
+    statement.setInt(4, 52);
+    statement.setInt(5, 126);
+    statement.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+    statement.setString(7, "126");
+    statement.setString(8, "bang_bang_kang");
+    statement.setInt(9, 4);
+    statement.setInt(10, 68);
+    assertEquals(1, statement.executeUpdate());
+    mDontCleanup = true;
+  }
+
   @Override
   protected void tearDown() throws Exception {
-    TestCaseDaoHelper.deleteAllItems(mItemDAO);
+    if (!mDontCleanup) {
+      TestCaseDaoHelper.deleteAllItems(mItemDAO);
+    }
   }
 }

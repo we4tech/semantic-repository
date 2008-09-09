@@ -76,7 +76,7 @@ public class ItemDAOImpl extends SqlMapClientDaoSupport
   }
 
   public List<Item> findItems(final Item pItem, final Integer pSkip,
-                                 final Integer pMax) {
+                              final Integer pMax) {
     return getSqlMapClientTemplate().
            queryForList(QUERY_FIND, pItem, pSkip, pMax);
   }
@@ -94,19 +94,11 @@ public class ItemDAOImpl extends SqlMapClientDaoSupport
   }
 
   public void startTransaction() {
-    try {
-      getSqlMapClientTemplate().getSqlMapClient().startTransaction();
-    } catch (Exception e) {
-      throw new ServiceException(null, "Failed to start transaction.", e);
-    }
+    throw new NoSuchMethodError("this method is not yet implemented");
   }
 
   public void endTransaction() {
-    try {
-      getSqlMapClientTemplate().getSqlMapClient().endTransaction();
-    } catch (Exception e) {
-      throw new ServiceException(null, "Failed to start transaction.", e);
-    }
+    throw new NoSuchMethodError("this method is not yet implemented");
   }
 
   public void commitTransaction() {

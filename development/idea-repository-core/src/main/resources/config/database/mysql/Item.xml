@@ -4,6 +4,15 @@
 
 <sqlMap namespace="Item">
 
+  <resultMap id="ItemResultMap" class="Item">
+    <result property="id" column="id"/>
+    <result property="title" column="title"/>
+    <result property="document" column="document"/>
+    <result property="createdOn" column="createdOn"/>
+    <result property="lastUpdatedOn" column="lastUpdatedOn"/>
+    <result property="indexRepository" column="indexRepository"/>
+  </resultMap>
+
   <!--+
       | Create new entry in to the Item table.
       +-->
@@ -69,7 +78,7 @@
   <!--+
       | Select a list of items from Item table.
       +-->
-  <select id="findItems" parameterClass="Item" resultClass="Item">
+  <select id="findItems" parameterClass="Item" resultMap="ItemResultMap">
     SELECT
       id,
       title,

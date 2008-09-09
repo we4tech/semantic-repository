@@ -58,6 +58,8 @@ public class BaseTestCase extends MockObjectSupportTestCase {
   }
 
   public void initiate() {
+    System.setProperty("configuration", "config");
+    System.setProperty("java.protocol.handler.pkgs", "com.ideabase.repository.core.protocols");
     // initiate spring context
     mContext = new ClassPathXmlApplicationContext(new String[] {
         "applicationContext.xml"

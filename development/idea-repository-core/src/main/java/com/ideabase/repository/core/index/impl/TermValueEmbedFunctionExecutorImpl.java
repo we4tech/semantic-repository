@@ -17,18 +17,26 @@ package com.ideabase.repository.core.index.impl;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
+import com.ideabase.repository.core.index.TermValueEmbedFunctionExecutor;
+import com.ideabase.repository.core.index.function.TermValueEmbedFunction;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Execute embed function from the search term.
  * ie. title:(x_functionName_term) 
  * @author <a href="http://hasan.we4tech.com">nhm tanveer...(hasan)</a>
  */
-public class TermValueEmbedFunctionExecutorImpl {
+public class TermValueEmbedFunctionExecutorImpl
+    implements TermValueEmbedFunctionExecutor {
 
   private static final Logger LOGGER =
       LogManager.getLogger(TermValueEmbedFunctionExecutorImpl.class);
   private static final String FUNCTION_NAME_PREFIX = "x_";
   private static final String FUNCTION_SEPARATOR = "_";
+  private final Map<String, TermValueEmbedFunction> mEmbedFunctions =
+      new HashMap<String, TermValueEmbedFunction>();
 
   public String eval(final String pTermString) {
     if (LOGGER.isDebugEnabled()) {
@@ -50,12 +58,30 @@ public class TermValueEmbedFunctionExecutorImpl {
 
       final String functionName = parts[1];
       final String value = parts[2];
-
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("embed function name - '" +
                    functionName + "' for value - '" + value + "'");
       }
+
+      // lookup function implementation
+      // if implementation found execute it or return the original value
+      final TermValueEmbedFunction functionImpl = 
+          mEmbedFunctions.get(functionName);
+      if (functionImpl != null) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("function name - " +
+                       functionName + " implementation found");
+        }
+        return functionImpl.call(value);
+      } else {
+        return pTermString;
+      }
     }
     return pTermString;
+  }
+
+  public void setEmbedFunctions(
+      final Map<String, TermValueEmbedFunction> pEmbedFunctions) {
+    mEmbedFunctions.putAll(pEmbedFunctions);
   }
 }

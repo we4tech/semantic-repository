@@ -56,6 +56,11 @@ public class WebConstants {
   public static final String PARAM_MAX = "max";
 
   /**
+   * Specify the query encoding format.
+   */
+  public static final String PARAM_ENCODE = "encode";
+
+  /**
    * Authentication token
    */
   public static final String PARAM_AUTH_TOKEN = "authToken";

@@ -193,7 +193,6 @@ public abstract class AbstractObjectBase implements ObjectBase {
     return document;
   }
 
-
   public Map<String, String> getFields() {
     return mFields;
   }

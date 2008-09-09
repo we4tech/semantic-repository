@@ -37,6 +37,7 @@ import static com.ideabase.repository.common.XmlConstants.*;
 import com.ideabase.repository.common.exception.ServiceException;
 import com.ideabase.repository.common.object.*;
 import com.ideabase.repository.core.auth.RepositoryUserPrincipal;
+import com.ideabase.repository.core.index.TermValueEmbedFunctionExecutor;
 import com.ideabase.repository.webservice.helper.ResponseBuilder;
 import com.ideabase.repository.webservice.helper.ResponseElement;
 import com.ideabase.repository.webservice.object.EmptyObject;
@@ -87,6 +88,11 @@ public class RESTfulControllerImpl implements RESTfulController {
    * Instance of implemented {@see StateManager}
    */
   private final StateManager mStateManager;
+
+  /**
+   * Executor implementation
+   */
+  private final TermValueEmbedFunctionExecutor mFunctionExecutor;
 
   /**
    * Default response format is used whenever processErrorAction is invoked
@@ -338,19 +344,23 @@ public class RESTfulControllerImpl implements RESTfulController {
    * @param pQueryParser dependency on {@see QueryParser}.
    * @param pRequestHandler web service request handler.
    * @param pStateManager dependency on {@see StateManager} implementation.
+   * @param pExecutor dependency on {@see TermValueEmbedFunctionExecutor}
+   *        implementation.
    */
   public RESTfulControllerImpl(final RepositoryService pRepositoryService,
                                final UserService pUserService,
                                final MessageSourceAccessor pSourceAccessor,
                                final QueryParser pQueryParser,
                                final WebServiceRequestHandler pRequestHandler,
-                               final StateManager pStateManager) {
+                               final StateManager pStateManager,
+                               final TermValueEmbedFunctionExecutor pExecutor) {
     mRepositoryService = pRepositoryService;
     mUserService = pUserService;
     mMessageAccessor = pSourceAccessor;
     mQueryParser = pQueryParser;
     mWebServiceRequestHandler = pRequestHandler;
     mStateManager = pStateManager;
+    mFunctionExecutor = pExecutor;
   }
 
   /**
@@ -616,9 +626,9 @@ public class RESTfulControllerImpl implements RESTfulController {
 
     // create response element to send out the response.
     final ResponseElement responseElement =
-          new ResponseElement(ELEMENT_ITEM, genericItem);
-      generateResponse(true, pAction, pRequest, pResponse,
-                       responseElement, STATUS_OK_200);
+        new ResponseElement(ELEMENT_ITEM, genericItem);
+    generateResponse(true, pAction, pRequest, pResponse,
+        responseElement, STATUS_OK_200);
   }
 
   private void handleFindFieldsAction(final RESTfulAction pAction,
@@ -869,6 +879,11 @@ public class RESTfulControllerImpl implements RESTfulController {
       for (final ObjectBase item : items) {
         // set user requested index repository
         item.setIndexRepository(requestedIndexRepository);
+        // execute embed function
+        final Map<String, String> fields = item.getFields();
+        for (final Map.Entry<String, String> field : fields.entrySet()) {
+          field.setValue(mFunctionExecutor.eval(field.getValue()));
+        }
         // load the existing object
         final ObjectBase existingItem;
         // Determine type of existing object item.
@@ -1001,8 +1016,19 @@ public class RESTfulControllerImpl implements RESTfulController {
       for (final ObjectBase item : items) {
         // on 'save' action there is no way user can set 'id' number.
         item.setId(null);
+
+        // execute embed function for title
+        item.setTitle(mFunctionExecutor.eval(item.getTitle()));
+
+        // execute embed function for fields
+        final Map<String, String> fields = item.getFields();
+        for (final Map.Entry<String, String> field : fields.entrySet()) {
+          field.setValue(mFunctionExecutor.eval(field.getValue()));
+        }
+
         // set index repository name
         item.setIndexRepository(indexRepository);
+
         // set author group.
         List<Integer> authorGroup =
             item.getRelatedItemsByRelationType(GroupConstants.GROUP_AUTHOR);
@@ -1142,8 +1168,11 @@ public class RESTfulControllerImpl implements RESTfulController {
       throws ParseException {
     // Find query expression
     final String parameter = pAction.getParameter();
-    final String queryString = pRequest.getParameter(parameter);
+    String queryString = pRequest.getParameter(parameter);
 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Query string - " + queryString);
+    }
     if (queryString == null) {
       throw new ServiceException(parameter, "Parameter has no such value.");
     }
@@ -1515,6 +1544,7 @@ public class RESTfulControllerImpl implements RESTfulController {
     pResponse.setStatus(pStatus);
     // set content type.
     pResponse.setContentType(findContentMimeType(pAction.getResponseFormat()));
+//    pResponse.setCharacterEncoding("UTF8");
     // send out response content.
     pResponse.getWriter().println(responseBuilder.buildResponse());
   }

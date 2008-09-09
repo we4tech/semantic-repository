@@ -10,8 +10,6 @@
   <!--
       Default url handler is based on the name property of bean definition.
   -->
-  <!--<bean id="urlMapping"
-        class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>-->
   <bean id="urlMapping"
         class="com.ideabase.repository.webservice.handler.RESTUrlHandlerMapping">
     <property name="patternMap">
@@ -32,6 +30,7 @@
     <constructor-arg index="3" ref="queryParser"/>
     <constructor-arg index="4" ref="webserviceRequestProcessor"/>
     <constructor-arg index="5" ref="stateManager"/>
+    <constructor-arg index="6" ref="termEmbedFunctionExecutor"/>
   </bean>
 
   <!--
@@ -51,5 +50,24 @@
     <constructor-arg index="1">
       <bean class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
     </constructor-arg>
+    <constructor-arg index="2" ref="termEmbedFunctionExecutor"/>
+  </bean>
+
+  <!--
+    Term embed function executor implementation
+  -->
+  <bean id="termEmbedFunctionExecutor"
+        class="com.ideabase.repository.core.index.impl.TermValueEmbedFunctionExecutorImpl">
+    <property name="embedFunctions">
+      <map>
+        <entry key="phoneticEncode">
+          <bean class="com.ideabase.repository.core.index.function.impl.PhoneticEncodeEmbedFunctionImpl">
+            <constructor-arg index="0">
+              <bean class="com.ideabase.dictionary.core.impl.BanglaPhoneticConverterImpl" />
+            </constructor-arg>
+          </bean>
+        </entry>
+      </map>
+    </property>
   </bean>
 </beans>

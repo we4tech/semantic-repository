@@ -33,8 +33,16 @@ public class Item {
     return document;
   }
 
+  public byte[] getDocumentBytes() {
+    return document.getBytes();
+  }
+
   public void setDocument(final String pDocument) {
     document = pDocument;
+  }
+
+  public void setDocumentBytes(final byte[] pDocumentBytes) {
+    document = new String(pDocumentBytes);
   }
 
   public Timestamp getCreatedOn() {
@@ -65,8 +73,16 @@ public class Item {
     return title;
   }
 
+  public byte[] getTitleBytes() {
+    return title.getBytes();
+  }
+
   public void setTitle(final String pTitle) {
     title = pTitle;
+  }
+
+  public void setTitleBytes(final byte[] pTitleBytes) {
+    title = new String(pTitleBytes);
   }
 
   public String getIndexRepository() {

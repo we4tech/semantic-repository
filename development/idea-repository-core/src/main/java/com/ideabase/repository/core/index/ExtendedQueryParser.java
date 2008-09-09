@@ -19,15 +19,9 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.*;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.document.NumberTools;
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
-
-import static com.ideabase.repository.common.CommonConstants.*;
-
-import java.io.IOException;
 
 /**
  * Extended query parser supports Number to pad
@@ -36,9 +30,35 @@ import java.io.IOException;
 public class ExtendedQueryParser extends QueryParser {
 
   private final Logger mLog = LogManager.getLogger(getClass());
+  private TermValueEmbedFunctionExecutor mEmbedFunctionExecutor;
 
-  public ExtendedQueryParser(final String pField, final Analyzer pAnalyzer) {
+
+  public ExtendedQueryParser(final String pField,
+                             final Analyzer pAnalyzer,
+                             final TermValueEmbedFunctionExecutor pExecutor) {
     super(pField, pAnalyzer);
+    mEmbedFunctionExecutor = pExecutor;
+  }
+
+  @Override
+  protected Query getFuzzyQuery(final String pField,
+                                final String pTermString,
+                                final float pMinimumSimilarity)
+      throws ParseException {
+    return super.getFuzzyQuery(
+        pField, executeEmbedFunction(pTermString), pMinimumSimilarity);
+  }
+
+  private String executeEmbedFunction(final String pTermString) {
+    if (mEmbedFunctionExecutor == null) {
+      return pTermString;
+    } else {
+      final String evaledString = mEmbedFunctionExecutor.eval(pTermString);
+      if (mLog.isDebugEnabled()) {
+        mLog.debug("Eval'd value - " + evaledString);
+      }
+      return evaledString;
+    }
   }
 
   @Override

@@ -24,4 +24,13 @@ package com.ideabase.repository.core.index.function;
  * @author <a href="http://hasan.we4tech.com">nhm tanveer...(hasan)</a>
  */
 public interface TermValueEmbedFunction {
+
+  /**
+   * Execute this function.
+   * @param pValue the specified term value
+   * @return the value after processing.
+   *         ie. if phoneticEncode function is used,
+   *         হাসান will be turned into "hasan"
+   */
+  String call(final String pValue);
 }

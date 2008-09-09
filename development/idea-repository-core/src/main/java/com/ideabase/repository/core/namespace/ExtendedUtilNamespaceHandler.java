@@ -191,7 +191,7 @@ public class ExtendedUtilNamespaceHandler extends NamespaceHandlerSupport {
 
           if (prefix == null) {
             throw new IllegalArgumentException("invalid system property - " +
-              prefixRef + ", which is not defined. use -Dsys:" +
+              prefixRef + ", which is not defined. use -D" +
               prefixRef + "=<value> to define scope string.");
           }
         }

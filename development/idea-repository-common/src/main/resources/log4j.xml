@@ -18,9 +18,9 @@
     </layout>
   </appender>
 
-  <logger name="com.ideabase.repository">
+  <!--<logger name="com.">
     <level value="DEBUG"/>
-  </logger>
+  </logger>-->
 
   <root>
     <level value="DEBUG"/>

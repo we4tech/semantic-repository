@@ -36,6 +36,10 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.util.Log4jConfigServlet;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -53,6 +57,7 @@ public class JettyRepositoryServerImpl implements RepositoryServer {
   private static final String KEY_THREAD_POOL = "theadPool";
   private static final String KEY_TMPDIR = "tmpDir";
   private static final String CONTEXT_PATH = "/";
+  private static final String ENCODING_UTF = "UTF8";
 
   private final Logger mLog = LogManager.getLogger(getClass());
   private RepositoryServerConfiguration mConfiguration;
@@ -115,7 +120,16 @@ public class JettyRepositoryServerImpl implements RepositoryServer {
 
     // add spring servlet
     final ServletHolder servletHolder =
-        new ServletHolder(DispatcherServlet.class);
+        new ServletHolder(DispatcherServlet.class) {
+          @Override
+          public void handle(final ServletRequest pRequest,
+                             final ServletResponse pResponse)
+              throws ServletException, UnavailableException, IOException {
+            pRequest.setCharacterEncoding(ENCODING_UTF);
+            pResponse.setCharacterEncoding(ENCODING_UTF);
+            super.handle(pRequest, pResponse);
+          }
+        };
     servletHolder.setInitParameter("contextConfigLocation",
                                    "classpath:/applicationContext.xml");
     servletHolder.setName("webservice-action-servlet");

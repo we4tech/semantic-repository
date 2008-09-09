@@ -26,16 +26,6 @@ CREATE TABLE `item` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `item`
---
-
-
-/*!40000 ALTER TABLE `item` DISABLE KEYS */;
-LOCK TABLES `item` WRITE;
-INSERT INTO `item` VALUES (115,'hasan','<fields><field name=\"title\"><![CDATA[hasan]]></field><field name=\"password\"><![CDATA[hasankhan]]></field></fields>','2007-06-19 16:05:26','2007-06-19 16:05:26'),(116,'hasan','<fields><field name=\"title\"><![CDATA[hasan]]></field><field name=\"password\"><![CDATA[hasankhan]]></field></fields>','2007-06-19 16:14:13','2007-06-19 16:14:13'),(117,'hasan','<fields><field name=\"title\"><![CDATA[hasan]]></field><field name=\"password\"><![CDATA[hasankhan]]></field></fields>','2007-06-19 16:14:19','2007-06-19 16:14:19');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `item` ENABLE KEYS */;
 
 --
 -- Table structure for table `itemmapping`
@@ -54,15 +44,6 @@ CREATE TABLE `itemmapping` (
   CONSTRAINT `FK_ItemMapping_leftId` FOREIGN KEY (`leftId`) REFERENCES `item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `itemmapping`
---
-
-
-/*!40000 ALTER TABLE `itemmapping` DISABLE KEYS */;
-LOCK TABLES `itemmapping` WRITE;
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `itemmapping` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
