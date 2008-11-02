@@ -54,8 +54,12 @@
   <!-- somewhere in repository -->
   <repositories>
     <repository>
+      <id>somewhere in... repository for thirdpary library</id>
+      <url>http://dev.somewherein.net/maven/thirdparty/</url>
+    </repository>
+    <repository>
       <id>somewhere in... repository for release</id>
-      <url>http://dev.somewherein.net/maven/thridparty/</url>
+      <url>http://dev.somewherein.net/maven/release/</url>
     </repository>
     <repository>
       <id>maven repository</id>

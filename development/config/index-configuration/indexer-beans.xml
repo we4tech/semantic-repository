@@ -9,9 +9,15 @@
                            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
                            http://dev.somewherein.net/schema/ext-util http://dev.somewherein.net/resources/schemas/ext-util-0.1.xsd">
 
+  <bean id="termUsageService" class="com.ideabase.repository.core.index.termUsage.TermUsageService"/>
+
   <!-- common services -->
   <bean id="standardAnalyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
   <bean id="keywordAnalyzer" class="org.apache.lucene.analysis.KeywordAnalyzer"/>
+  <bean id="termUsageAnalyzer" class="com.ideabase.repository.core.index.analyzer.TermUsageAnalyzer">
+    <constructor-arg index="0" ref="standardAnalyzer"/>
+    <constructor-arg index="1" ref="termUsageService"/>
+  </bean>
 
   <!-- added supported embed function -->
   <!--<bean class="com.ideabase.repository.core.index.impl.TermValueEmbedFunctionExecutorImpl">

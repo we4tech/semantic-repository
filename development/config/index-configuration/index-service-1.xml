@@ -20,11 +20,13 @@
   </bean>
 
   <bean id="indexFactory1"
-        class="org.springmodules.lucene.index.support.SimpleIndexFactoryBean">
+        class="com.ideabase.repository.core.index.bean.TermUsageAwareIndexFactoryBean">
     <property name="directory" ref="fsDirectory1"/>
     <property name="create" value="true"/>
     <property name="analyzer" ref="standardAnalyzer"/>
+    <!--<property name="analyzer" ref="termUsageAnalyzer"/>-->
     <property name="resolveLock" value="true"/>
+    <property name="termUsageService" ref="termUsageService"/>
   </bean>
 
   <bean id="searchFactroy1"
@@ -36,6 +38,7 @@
   <bean id="itemIndex1"
         class="com.ideabase.repository.core.index.impl.RepositoryItemIndexImpl">
     <property name="indexFactory" ref="indexFactory1"/>
+    <property name="analyzer" ref="termUsageAnalyzer"/>
   </bean>
 
   <!-- Repository item searcher -->
