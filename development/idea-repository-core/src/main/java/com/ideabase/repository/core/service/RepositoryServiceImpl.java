@@ -603,6 +603,47 @@ public class RepositoryServiceImpl implements RepositoryService {
   }
 
   /**
+   * Perform search by the specified {@code pQuery}
+   * Use {@code pMaxItemsToBeUsedForCollectingTokens} number of items
+   * to collect unique tokens
+   * Lookup in our supporting token vector database to find the hits information
+   * if hits information is less than {@code pMinimumHits} that token
+   * won't be included.
+   * only return the {@code pMaxTokens} number of tokens as {@code Map}
+   *
+   * @param pQuery lucene query wrapper object as parameter
+   * @param pMinimumHits minimum number of hits for each token which.
+   * @param pMaxTokens maximum number of tokens
+   * @return map of string and integer where string is token and integer
+   *        is the usages of the token.
+   */
+  public Map<String, Integer> getTokenTagCloudByQuery(
+    final Query pQuery,
+    final Integer pMinimumHits,
+    final Integer pMaxTokens) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Perform search by the specified " + pQuery);
+    }
+     
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("collect unique tokens");
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Lookup in our supporting token vector database to " +
+                "find the hits information");
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("if hits information is less than " + pMinimumHits +
+                " that token this token won't be included in result");
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("only return the " + pMaxTokens +
+                " number of tokens as {@code Map}");
+    }
+    return Collections.EMPTY_MAP;
+  }
+
+  /**
    * {@inheritDoc}
    */
   public Integer addRelatedItem(final String pRelationType,

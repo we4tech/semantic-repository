@@ -62,4 +62,12 @@ public interface RepositoryItemIndex {
    */
   void optimize();
 
+  /**
+   * To enable or disable threaded execution while exeucting index
+   * related action.
+   *
+   * @param pThreadedTaskExecution {@code boolean} value
+   */
+  void setThreadedTaskExecution(final boolean pThreadedTaskExecution);
+
 }

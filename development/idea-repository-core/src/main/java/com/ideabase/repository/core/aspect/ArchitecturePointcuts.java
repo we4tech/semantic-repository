@@ -61,5 +61,4 @@ public class ArchitecturePointcuts {
   @Pointcut("execution(* com.ideabase.repository.webservice.controller.*." +
             "handleRequest(..))")
   public void webServiceOperation() {}
-
 }

@@ -238,4 +238,17 @@ public interface RepositoryService {
   int getAllItemsCount();
 
   int getItemsCountByIndexRepository(final String pIndexRepository);
+
+  /**
+   * Generate tag cloud based on the found unique tokens by the specified
+   * query
+   * @param pQuery lucene query wrapper object as parameter
+   * @param pMinimumHits minimum number of hits for each token which.
+   * @param pMaxTokens maximum number of tokens
+   * @return the map of tokens with the number of usages
+   */
+  Map<String, Integer> getTokenTagCloudByQuery(
+    final Query pQuery,
+    final Integer pMinimumHits,
+    final Integer pMaxTokens);
 }

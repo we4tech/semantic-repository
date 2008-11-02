@@ -84,11 +84,17 @@ public class GenericItem extends AbstractObjectBase implements VisitableObject {
     return mLastUpdatedOn;
   }
 
+  @Override
   public Document getDocument() {
     final Document document = super.getDocument();
     // Add fields to indexable. (no store)
     acceptVisitor(new Visitor() {
       public void visitField(final String pName, final String pValue) {
+        // remove existing field
+        if (document.getFields(pName) != null) {
+          document.removeField(pName);
+        }
+
         // TODO: hardcoded behavior for indexing price or number type field
         final String name = pName.toLowerCase();
         if (name.startsWith(FIELD_PREFIX_PRICE) ||
