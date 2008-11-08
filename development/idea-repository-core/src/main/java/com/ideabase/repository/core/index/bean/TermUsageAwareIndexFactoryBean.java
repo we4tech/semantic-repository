@@ -18,7 +18,7 @@ package com.ideabase.repository.core.index.bean;
 import org.springmodules.lucene.index.support.SimpleIndexFactoryBean;
 import org.springmodules.lucene.index.factory.SimpleIndexFactory;
 import com.ideabase.repository.core.index.factory.TermUsageAwareIndexFactory;
-import com.ideabase.repository.core.index.termUsage.TermUsageService;
+import com.ideabase.repository.core.index.service.TermUsageService;
 
 /**
  * To remove term usage count when index is removed otherwise term usage

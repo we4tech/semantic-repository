@@ -36,7 +36,7 @@ import com.ideabase.repository.common.exception.ServiceException;
  * Implementation of a typical list, but it supports pagination.
  * @author <a href="mailto:hasan@somewherein.net">nhm tanveer hossain khan (hasan)</a>
  */
-public class PaginatedList<E> extends AbstractList {
+public class PaginatedList<E> extends AbstractList<E> {
 
   /**
    * Maximum number of rows.

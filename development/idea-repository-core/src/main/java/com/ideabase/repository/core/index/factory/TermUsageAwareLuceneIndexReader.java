@@ -21,18 +21,16 @@ import org.springmodules.lucene.search.factory.LuceneHits;
 import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Token;
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import com.ideabase.repository.core.index.termUsage.TermUsageService;
+import com.ideabase.repository.core.index.service.TermUsageService;
+import static com.ideabase.repository.core.helper.IndexHelper.isAcceptableFieldNameForTokenCollection;
 
 /**
  * To trigger action while removing or creating new index.
@@ -63,34 +61,37 @@ public class TermUsageAwareLuceneIndexReader implements LuceneIndexReader {
   }
 
   public void deleteDocument(final int i) throws IOException {
-    System.out.println("DeleteDocument(" + i + ")");
     mBaseLuceneIndexReader.deleteDocument(i);
   }
 
   public int deleteDocuments(final Term pTerm) throws IOException {
-    System.out.println("deleteDocuments(" + pTerm + ")");
     // create new searcher to find the document
-    final LuceneSearcher searcher = createSearcher();
-    try {
-      // find the document body
-      final LuceneHits hits = searcher.search(new TermQuery(pTerm));
-      // remove the token count
-      if (hits != null && hits.length() > 0) {
-        for (int i = 0; i < hits.length(); i++) {
-          final TermFreqVector[] termFreqVectors = 
-            mBaseLuceneIndexReader.getTermFreqVectors(hits.id(i));
-          if (termFreqVectors != null && termFreqVectors.length > 0) {
-            for (final TermFreqVector freqVector : termFreqVectors) {
-              for (final String pTermString : freqVector.getTerms()) {
-                mTermUsageService.decrementTermCount(pTermString.trim());
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("DD: caculating tokens for - " + pTerm.field());
+    }
+    if (isAcceptableFieldNameForTokenCollection(pTerm.field())) {
+      final LuceneSearcher searcher = createSearcher();
+      try {
+        // find the document body
+        final LuceneHits hits = searcher.search(new TermQuery(pTerm));
+        // remove the token count
+        if (hits != null && hits.length() > 0) {
+          for (int i = 0; i < hits.length(); i++) {
+            final TermFreqVector[] termFreqVectors =
+              mBaseLuceneIndexReader.getTermFreqVectors(hits.id(i));
+            if (termFreqVectors != null && termFreqVectors.length > 0) {
+              for (final TermFreqVector freqVector : termFreqVectors) {
+                for (final String pTermString : freqVector.getTerms()) {
+                  mTermUsageService.decrementTermCount(pTermString.trim());
+                }
               }
             }
           }
         }
+      } finally {
+        // close the searcher
+        searcher.close();
       }
-    } finally {
-      // close the searcher
-      searcher.close();
     }
     // delete the document
     return mBaseLuceneIndexReader.deleteDocuments(pTerm);

@@ -63,7 +63,6 @@ public class RepositoryItemIndexImpl extends LuceneIndexSupport
         if (getAnalyzer() == null) {
           getLuceneIndexTemplate().addDocument(pDocument);
         } else {
-          System.out.println(getAnalyzer());
           getLuceneIndexTemplate().addDocument(pDocument, getAnalyzer());
         }
       }

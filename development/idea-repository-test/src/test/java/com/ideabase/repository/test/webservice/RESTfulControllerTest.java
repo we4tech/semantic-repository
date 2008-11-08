@@ -640,6 +640,37 @@ public class RESTfulControllerTest extends BaseRestfullControllerTestcase {
     LOG.debug("Response content - " + responseContent);
   }
 
+  public void testGetTermTagCloudByQuery() throws Exception {
+    // create some dummy data
+    TestCaseRepositoryHelper.fixCreateItems(mRepositoryService, 5);
+
+    final Integer userId = TestCaseRepositoryHelper.
+        fixCreateUser(mUserService, "hasan", "hasankhan");
+    final MockHttpServletRequest request = new MockHttpServletRequest();
+    final MockHttpServletResponse response = new MockHttpServletResponse();
+
+    // set http request parameters
+    request.setRequestURI("/service/tagcloud/query.xml");
+    request.setMethod(METHOD_GET);
+    request.setParameter("query", "name:fox");
+    request.setParameter("max", "50");
+    request.setParameter("select", "name");
+
+    // fix login state
+    final Subject subject = getSubjectFromASuccessfulRequest();
+    final MockHttpSession session = new MockHttpSession();
+    session.setAttribute(WebConstants.SESSION_ATTR_USER_SUBJECT, subject);
+    request.setSession(session);
+
+    final ModelAndView modelAndView =
+        mRestfulController.handleRequest(request, response);
+
+    // verify response
+    final String responseContent = response.getContentAsString();
+    assertNotNull(responseContent);
+    LOG.debug("Response content - " + responseContent);
+  }
+
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();

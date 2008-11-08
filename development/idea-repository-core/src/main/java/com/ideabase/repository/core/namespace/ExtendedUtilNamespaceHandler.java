@@ -49,6 +49,7 @@ public class ExtendedUtilNamespaceHandler extends NamespaceHandlerSupport {
   private static final String ATTR_PATH_PREFIX = "path-prefix";
 
   private static final String PROPERTY_FROM_SYSTEM_PROPERTY = "fromSystemProperty";
+  private static final String PROPERTY_MAGIC_URL_PREFIX = "__extUrlPrefix";
   private static final String RESOURCE_SUFFIX = ".properties";
   private static final String SCOPE_NAME_FROM_SYSTEM_PROPERTIES_PREFIX = "sys:";
 
@@ -132,6 +133,7 @@ public class ExtendedUtilNamespaceHandler extends NamespaceHandlerSupport {
         // if cache doesnt hold any properties, load the properties file
         // and cache.
         if (scopedProperties == null) {
+          System.out.println("__PTH - " + propertiesPath);
           scopedProperties = loadPropertiesAndCache(propertiesPath);
         }
 

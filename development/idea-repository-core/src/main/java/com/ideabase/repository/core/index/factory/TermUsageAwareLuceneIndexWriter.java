@@ -26,11 +26,13 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Similarity;
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
-import com.ideabase.repository.core.index.termUsage.TermUsageService;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+
+import com.ideabase.repository.core.index.service.TermUsageService;
+import static com.ideabase.repository.core.helper.IndexHelper.isAcceptableFieldNameForTokenCollection;
 
 /**
  * To store terms when new item is indexed.
@@ -76,13 +78,17 @@ public class TermUsageAwareLuceneIndexWriter implements LuceneIndexWriter {
     for (final Object fieldObject : pDocument.getFields()) {
       final Field field = (Field) fieldObject;
       try {
-        if (field.isTokenized()) {
-          final TokenStream tokenStream = pAnalyzer.tokenStream(field.name(), new StringReader(field.stringValue()));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("PTFD: caculating tokens for - " + field.name() + " - " + isAcceptableFieldNameForTokenCollection(field.name()));
+        }
+        if (isAcceptableFieldNameForTokenCollection(field.name()) && field.isTokenized()) {
+          final TokenStream tokenStream = pAnalyzer.
+              tokenStream(field.name(), new StringReader(field.stringValue()));
           if (tokenStream != null) {
             Token token = null;
             while ((token = tokenStream.next()) != null) {
               final String tokenString = String.valueOf(token.termBuffer()).trim();
-              mTermUsageService.incrementTermCount(tokenString);
+              mTermUsageService.incrementTermCount(tokenString, field.name());
             }
           }
         }

@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.List;
 
 import com.ideabase.repository.common.exception.ServiceException;
+import static com.ideabase.repository.common.CommonConstants.FieldNames.*;
 
 /**
  * Generic item holds all extra object inside a hash map. it is very useful
@@ -40,11 +41,6 @@ import com.ideabase.repository.common.exception.ServiceException;
  * @author <a href="mailto:hasan@somewherein.net">nhm tanveer hossain khan (hasan)</a>
  */
 public class GenericItem extends AbstractObjectBase implements VisitableObject {
-
-  private static final String FIELD_PREFIX_PRICE = "price";
-  private static final String FIELD_SUFFIX_ID = "_id";
-  private static final String FIELD_SUFFIX_DATE = "_date";
-  private static final String FIELD_SUFFIX_NUMBER = "_number";
 
   private Integer mId;
   private transient String mTitle;

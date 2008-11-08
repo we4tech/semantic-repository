@@ -19,10 +19,9 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 
 import java.io.Reader;
-import java.io.IOException;
 
 import com.ideabase.repository.core.index.filter.TermUsageFilter;
-import com.ideabase.repository.core.index.termUsage.TermUsageService;
+import com.ideabase.repository.core.index.service.TermUsageService;
 
 /**
  * to store term in different data source and to keep the usages 

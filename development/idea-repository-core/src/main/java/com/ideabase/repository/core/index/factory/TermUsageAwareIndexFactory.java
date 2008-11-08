@@ -16,7 +16,7 @@
 package com.ideabase.repository.core.index.factory;
 
 import org.springmodules.lucene.index.factory.*;
-import com.ideabase.repository.core.index.termUsage.TermUsageService;
+import com.ideabase.repository.core.index.service.TermUsageService;
 
 /**
  * Term usage aware index factory, which can remove term usages when

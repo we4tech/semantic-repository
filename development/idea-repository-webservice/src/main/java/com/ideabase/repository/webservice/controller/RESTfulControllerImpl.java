@@ -38,6 +38,7 @@ import com.ideabase.repository.common.exception.ServiceException;
 import com.ideabase.repository.common.object.*;
 import com.ideabase.repository.core.auth.RepositoryUserPrincipal;
 import com.ideabase.repository.core.index.TermValueEmbedFunctionExecutor;
+import com.ideabase.repository.core.index.service.TermUsageService;
 import com.ideabase.repository.webservice.helper.ResponseBuilder;
 import com.ideabase.repository.webservice.helper.ResponseElement;
 import com.ideabase.repository.webservice.object.EmptyObject;
@@ -47,6 +48,10 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Token;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -287,6 +292,11 @@ public class RESTfulControllerImpl implements RESTfulController {
   private static final String ACTION_FIND_FIELD_NAMES = "find_field_names";
 
   /**
+   * Generate tag cloud for the given query
+   */
+  private static final String ACTION_TAGCLOUD = "tagcloud";
+
+  /**
    * No string is set.
    */
   private static final String EMPTY_STRING = "";
@@ -332,6 +342,21 @@ public class RESTfulControllerImpl implements RESTfulController {
    */
   private final WebServiceRequestHandler mWebServiceRequestHandler;
 
+  /**
+   * Default value for collecting terms from the number of articles
+   */
+  private static final int DEFAULT_TAGCLOUD_MAX = 20;
+
+  /**
+   * speacially used for generating tag cloud
+   */
+  private Analyzer mTagCloudAnalyzer = new StandardAnalyzer();
+
+  /**
+   * Term usage service instance
+   */
+  private final TermUsageService mTermUsageService;
+
 
   /**
    * Default constructor, {@see RepositoryService}, {@see UserService},
@@ -353,7 +378,8 @@ public class RESTfulControllerImpl implements RESTfulController {
                                final QueryParser pQueryParser,
                                final WebServiceRequestHandler pRequestHandler,
                                final StateManager pStateManager,
-                               final TermValueEmbedFunctionExecutor pExecutor) {
+                               final TermValueEmbedFunctionExecutor pExecutor,
+                               final TermUsageService pTermUsageService) {
     mRepositoryService = pRepositoryService;
     mUserService = pUserService;
     mMessageAccessor = pSourceAccessor;
@@ -361,6 +387,7 @@ public class RESTfulControllerImpl implements RESTfulController {
     mWebServiceRequestHandler = pRequestHandler;
     mStateManager = pStateManager;
     mFunctionExecutor = pExecutor;
+    mTermUsageService = pTermUsageService;
   }
 
   /**
@@ -549,10 +576,77 @@ public class RESTfulControllerImpl implements RESTfulController {
     else if (ACTION_OPTIMIZE.equals(pAction.getAction())) {
       handleOptimizeAction(pAction, pRequest, pResponse);
     }
+    // handle query tag cloud action
+    else if (ACTION_TAGCLOUD.equals(pAction.getAction())) {
+      handleTagcloudAction(pAction, pRequest, pResponse);
+    }
     // handle unknown action
     else {
       invalidActionResponse(pAction, KEY_INVALID_ACTION, pResponse);
     }
+  }
+
+  private void handleTagcloudAction(final RESTfulAction pAction,
+                                    final HttpServletRequest pRequest,
+                                    final HttpServletResponse pResponse)
+      throws ParseException, IOException {
+    
+    // find max article parameter
+    final String maxString = pRequest.getParameter(PARAM_MAX);
+    final int max;
+    if (maxString != null) {
+      max = Integer.parseInt(maxString);
+    } else {
+      max = DEFAULT_TAGCLOUD_MAX;
+    }
+    // perform search with the given query and max articles
+    final PaginatedList<Hit> hits =
+        performSearch(pAction, pRequest, pResponse);
+
+    // find select parameter
+    final String paramSelect = pRequest.getParameter(PARAM_SELECT);
+    if (paramSelect == null || paramSelect.length() == 0) {
+      throw new RuntimeException("no such parameter called 'select', example " +
+          "usages - /service/find_*/q.xml?q=query&select=item_id, price");
+    }
+    final String[] fields = paramSelect.split(SEPARATOR_COMMA);
+
+    final GenericItem tagCloudHolder = new GenericItem();
+    if (hits != null && !hits.isEmpty()) {
+      final Map<String, String> itemFields = new HashMap<String, String>();
+
+      // iterate each article
+      for (final Hit hit : hits) {
+        final GenericItem item =
+            mRepositoryService.getItem(hit.getId(), GenericItem.class);
+
+        if (item != null) {
+          // collect terms from the fields which was mentioned in select parameter
+          for (final String field : fields) {
+            final String value = item.getField(field.trim());
+            if (value != null) {
+              final TokenStream tokenStream = mTagCloudAnalyzer.
+                  tokenStream(EMPTY_STRING, new StringReader(value));
+              Token token = null;
+              while ((token = tokenStream.next()) != null) {
+                final String tokenString =
+                    String.valueOf(token.termBuffer()).trim();
+                if (!itemFields.containsKey(tokenString)) {
+                  // lookup term store to find all term count
+                  int termCount = mTermUsageService.getUsageCountOf(tokenString);
+                  itemFields.put(tokenString,
+                                 String.valueOf(termCount));
+                }
+              }
+            }
+          }
+        }
+      }
+      tagCloudHolder.setFields(itemFields);
+    }
+    final ResponseElement responseElement = new ResponseElement(ELEMENT_ITEM, tagCloudHolder);
+    generateResponse(true, pAction, pRequest, pResponse,
+                     responseElement, STATUS_OK_200);
   }
 
   private void handleOptimizeAction(final RESTfulAction pAction,

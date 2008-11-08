@@ -67,9 +67,6 @@ public class ExtendedRangeFilter extends RangeFilter {
     final TermEnum enumerator = (mIncludeLower
             ? reader.terms(new Term(mFieldName, mLowerTerm))
             : reader.terms(new Term(mFieldName, "")));
-    /*do {
-      System.out.println("TERM __ " + enumerator.term() + " FREQ - " + enumerator.docFreq());  
-    } while (enumerator.next());*/
     try {
       if (enumerator.term() == null) {
         return bits;
@@ -80,7 +77,6 @@ public class ExtendedRangeFilter extends RangeFilter {
       try {
         do {
           final Term currentTerm = enumerator.term();
-          System.out.println("Term- " + currentTerm);
           final boolean sameField = (currentTerm != null && currentTerm.field().equals(mFieldName));
           if (sameField) {
             Long valueNumber = 0L;
@@ -90,10 +86,8 @@ public class ExtendedRangeFilter extends RangeFilter {
             if (mNumberField) {
               valueNumber = Long.valueOf(valueText);
               compareResult = valueNumber.compareTo(mLowerTermNumber);
-              System.out.println("Compare -LN- " + valueNumber + " VS " + mLowerTermNumber + "=" + compareResult);
             } else {
               compareResult = valueText.compareTo(mLowerTerm);
-              System.out.println("Compare -L- " + valueText + " VS " + mLowerTerm + "=" + compareResult);
             }
             if (noLowerBound || compareResult > 0) {
               checkLower = false;
@@ -101,10 +95,8 @@ public class ExtendedRangeFilter extends RangeFilter {
                 final int compare;
                 if (mNumberField) {
                   compare = mUpperTermNumber.compareTo(valueNumber);
-                  System.out.println("Compare -UN- " + mUpperTermNumber + " VS " + valueNumber + "=" + compare);
                 } else {
                   compare = mUpperTerm.compareTo(valueText);
-                  System.out.println("Compare -U- " + mUpperTerm + " VS " + valueText + "=" + compare);
                 }
                 /*
                  * if beyond the upper term, or is exclusive and

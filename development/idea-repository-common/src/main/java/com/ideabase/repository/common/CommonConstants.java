@@ -28,4 +28,14 @@ public class CommonConstants {
   public static final String FIELD_PREFIX_PRICE = "price";
   public static final String FIELD_SUFFIX_ID = "_id";
   public static final String FIELD_SUFFIX_DATE = "_date";
+
+  public static class FieldNames {
+    public static final String FIELD_PREFIX_PRICE = "price";
+    public static final String FIELD_SUFFIX_ID = "_id";
+    public static final String FIELD_SUFFIX_DATE = "_date";
+    public static final String FIELD_SUFFIX_NUMBER = "_number";
+    public static final String FIELD_SUFFIX_IGNORE = "_ignore";
+    public static final String FIELD_SUFFIX_ON = "on";
+    public static final String FIELD_ID = "id";
+  }
 }

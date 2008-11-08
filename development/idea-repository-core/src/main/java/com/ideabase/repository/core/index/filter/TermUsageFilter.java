@@ -24,10 +24,8 @@ import org.apache.log4j.LogManager;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.Map;
-import java.util.HashMap;
 
-import com.ideabase.repository.core.index.termUsage.TermUsageService;
+import com.ideabase.repository.core.index.service.TermUsageService;
 
 /**
  * To find seprate token and store them in seperate storage and calculate their usages.

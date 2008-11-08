@@ -33,6 +33,7 @@ public class CoreServiceKey {
   // ---------- DAO RELATED OBJECTS ---------------------
   public static final String ITEM_DAO = "itemDAO";
   public static final String ITEM_MAPPING_DAO = "itemMappingDAO";
+  public static final String TERM_DAO = "termDAO";
 
   // ---------- CACHE RELATED OBJECTS ---------------------
   public static final String CLASS_CACHE = "classCache";

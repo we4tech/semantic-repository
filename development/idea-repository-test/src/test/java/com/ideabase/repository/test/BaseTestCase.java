@@ -32,6 +32,7 @@ import org.jmock.core.MockObjectSupportTestCase;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.io.File;
 
 /**
  * Base test case added common variable over protected scope.
@@ -45,6 +46,9 @@ public class BaseTestCase extends MockObjectSupportTestCase {
   public static final Logger LOG = LogManager.getLogger(BaseTestCase.class);
   public ApplicationContext mContext;
 
+  public BaseTestCase() {
+    initiate();
+  }
 
   /**
    * Load spring context.
@@ -54,19 +58,20 @@ public class BaseTestCase extends MockObjectSupportTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    initiate();
-  }
-
-  public void initiate() {
-    System.setProperty("configuration", "config");
-    System.setProperty("java.protocol.handler.pkgs", "com.ideabase.repository.core.protocols");
     // initiate spring context
     mContext = new ClassPathXmlApplicationContext(new String[] {
         "applicationContext.xml"
     });
-    System.setProperty("java.security.auth.login.config", "/Users/nhmtanveerhossainkhanhasan/projects/ideabase-products/idea-repository/development/idea-repository-common/src/main/resources/security/jaas.config");
-//    System.setProperty("java.security.auth.login.config", "D:\\JAVAProjects\\IDEABase\\IDEAContentRepo\\development\\idea-repository-common\\src\\main\\resources\\security\\jaas.config");
-    System.setProperty("java.security.auth.policy", "/Users/nhmtanveerhossainkhanhasan/projects/ideabase-products/idea-repository/development/idea-repository-common/src/main/resources/security/repository.policy");
-//    System.setProperty("java.security.auth.policy", "D:\\JAVAProjects\\IDEABase\\IDEAContentRepo\\development\\idea-repository-common\\src\\main\\resources\\security\\repository.policy");
+  }
+
+  public void initiate() {
+    // add jaas login  module & policy
+    System.setProperty("java.security.auth.login.config", "security/jaas.config");
+    System.setProperty("java.security.auth.policy", "security/repository.policy");
+    System.setProperty("configuration", new File("./config").getAbsolutePath());
+    System.setProperty("java.protocol.handler.pkgs", "com.ideabase.repository.core.protocols");
+    System.setProperty("__extUrlPrefix", "../");
+    System.err.println("Configuration path - " + System.getProperty("configuration"));
+    System.setProperty("DEBUG", "true");
   }
 }
