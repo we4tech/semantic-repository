@@ -69,18 +69,18 @@ public class TermUsageAwareLuceneIndexReader implements LuceneIndexReader {
     if (LOG.isDebugEnabled()) {
       LOG.debug("DD: caculating tokens for - " + pTerm.field());
     }
-    if (isAcceptableFieldNameForTokenCollection(pTerm.field())) {
-      final LuceneSearcher searcher = createSearcher();
-      try {
-        // find the document body
-        final LuceneHits hits = searcher.search(new TermQuery(pTerm));
-        // remove the token count
-        if (hits != null && hits.length() > 0) {
-          for (int i = 0; i < hits.length(); i++) {
-            final TermFreqVector[] termFreqVectors =
-              mBaseLuceneIndexReader.getTermFreqVectors(hits.id(i));
-            if (termFreqVectors != null && termFreqVectors.length > 0) {
-              for (final TermFreqVector freqVector : termFreqVectors) {
+    final LuceneSearcher searcher = createSearcher();
+    try {
+      // find the document body
+      final LuceneHits hits = searcher.search(new TermQuery(pTerm));
+      // remove the token count
+      if (hits != null && hits.length() > 0) {
+        for (int i = 0; i < hits.length(); i++) {
+          final TermFreqVector[] termFreqVectors =
+            mBaseLuceneIndexReader.getTermFreqVectors(hits.id(i));
+          if (termFreqVectors != null && termFreqVectors.length > 0) {
+            for (final TermFreqVector freqVector : termFreqVectors) {
+              if (isAcceptableFieldNameForTokenCollection(freqVector.getField())) {
                 for (final String pTermString : freqVector.getTerms()) {
                   mTermUsageService.decrementTermCount(pTermString.trim());
                 }
@@ -88,10 +88,10 @@ public class TermUsageAwareLuceneIndexReader implements LuceneIndexReader {
             }
           }
         }
-      } finally {
-        // close the searcher
-        searcher.close();
       }
+    } finally {
+      // close the searcher
+      searcher.close();
     }
     // delete the document
     return mBaseLuceneIndexReader.deleteDocuments(pTerm);

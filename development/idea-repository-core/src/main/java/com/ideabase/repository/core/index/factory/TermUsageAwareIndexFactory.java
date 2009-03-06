@@ -28,7 +28,7 @@ import com.ideabase.repository.core.index.service.TermUsageService;
  */
 public class TermUsageAwareIndexFactory implements IndexFactory {
 
-  private SimpleIndexFactory mBaseIndexFactory;
+  private final SimpleIndexFactory mBaseIndexFactory;
   public static TermUsageService mTermUsageService;
 
   public TermUsageAwareIndexFactory(

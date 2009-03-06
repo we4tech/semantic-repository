@@ -31,6 +31,8 @@
     <constructor-arg index="4" ref="webserviceRequestProcessor"/>
     <constructor-arg index="5" ref="stateManager"/>
     <constructor-arg index="6" ref="termEmbedFunctionExecutor"/>
+    <constructor-arg index="7" ref="termUsageService"/>
+    <constructor-arg index="8" ref="standardAnalyzer"/>
   </bean>
 
   <!--

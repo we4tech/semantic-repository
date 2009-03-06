@@ -69,7 +69,7 @@ public class TermUsageAwareIndexFactoryTest extends BaseTestCase {
     final GenericItem item = new GenericItem();
     item.setTitle("token1 token2 token3");
     item.addField("field1", "value1 value2 value3");
-    item.addField("field2", "value1 value2 value3");
+    item.addField("field2", "value1 value2 value3 ab abc abcdefghijlm abcdefghijlmn");
     assertNotNull(mRepositoryService.save(item));
 
     // create item - 2
@@ -89,7 +89,7 @@ public class TermUsageAwareIndexFactoryTest extends BaseTestCase {
     assertEquals(1, TermUsageAwareIndexFactory.mTermUsageService.map().get("token1").intValue());
     assertEquals(2, TermUsageAwareIndexFactory.mTermUsageService.map().get("token2").intValue());
     assertEquals(1, TermUsageAwareIndexFactory.mTermUsageService.map().get("token3").intValue());
-
+    
     return new GenericItem[] {item, item2};
   }
 
@@ -123,7 +123,7 @@ public class TermUsageAwareIndexFactoryTest extends BaseTestCase {
     assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("token1").intValue());
     assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("token2").intValue());
     assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("token3").intValue());
-
+    Thread.sleep(4000);
   }
 
 }

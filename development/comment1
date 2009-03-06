@@ -1,0 +1,8 @@
+
+added unicode support and embed function
+
+now semantic repository is supporting unicode character on index and database, if you want to use phonetic encode or this type of embed function. 
+you can prefix your term with "x_phoneticEncode_" ie. "x_phoneticEncode_book"
+
+embed function is now only supported on fuzzy query and while updating or creating new item.
+

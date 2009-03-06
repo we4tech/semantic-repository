@@ -1,0 +1,2 @@
+truncate term;
+truncate item;

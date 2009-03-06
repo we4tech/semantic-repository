@@ -16,6 +16,7 @@
 package com.ideabase.repository.core.index.service;
 
 import java.util.Map;
+import java.util.List;
 
 /**
  * Store term usage count
@@ -37,10 +38,17 @@ public interface TermUsageService {
   void incrementTermCount(final String pTerm, final String pField);
 
   /**
-   * Decrement count for the specific term (@code pTerm}
+   * Decrement count for the specific term {@code pTerm}
    * @param pTerm string
    */
   void decrementTermCount(final String pTerm);
+
+  /**
+   * Decrement count for the spepcific term {@code pTerm}
+   * @param pTerm string
+   * @param pField field name
+   */
+  void decrementTermCount(final String pTerm, final String pField);
 
   /**
    * Total number of terms stored
@@ -60,5 +68,25 @@ public interface TermUsageService {
    * @return usage count
    */
   int getUsageCountOf(final String pTerm);
+
+  /**
+   * Retrieve count for each tags and return in a hash map.
+   * @param pTags list of tags
+   * @param pMax total number of tags
+   * @return map of tag cloud data
+   */
+  Map<String, String> getTags(final List pTags, final int pMax);
+
+  /**
+   * Get maximum number of allowed words
+   * @return max number of allowed words
+   */
+  int getMaxWordLength();
+
+  /**
+   * Get minimum number of allowed words
+   * @return min number of allowed words
+   */
+  int getMinWordLength();
 
 }

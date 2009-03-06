@@ -1,0 +1,1 @@
+mysql -uroot repository_test < db-clean.sql

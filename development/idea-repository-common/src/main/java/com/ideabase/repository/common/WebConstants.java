@@ -56,6 +56,11 @@ public class WebConstants {
   public static final String PARAM_MAX = "max";
 
   /**
+   * Maximum number of tags
+   */
+  public static final String PARAM_MAX_TAGS = "max_rows";
+
+  /**
    * Specify the query encoding format.
    */
   public static final String PARAM_ENCODE = "encode";

@@ -16,6 +16,7 @@
 package com.ideabase.repository.core.index.service;
 
 import java.util.Map;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,6 +27,8 @@ public class TermUsageServiceHashMapBasedImpl implements TermUsageService {
 
   private Map<String, Integer> mTermUsages =
     new ConcurrentHashMap<String, Integer>();
+  private int mMaxWordLength;
+  private int mMinWordLength;
 
   public void incrementTermCount(final String pTerm) {
     final String term = pTerm.trim();
@@ -50,6 +53,10 @@ public class TermUsageServiceHashMapBasedImpl implements TermUsageService {
     }
   }
 
+  public void decrementTermCount(final String pTerm, final String pField) {
+    throw new NoSuchMethodError("this method is not yet implemented");
+  }
+
   public int length() {
     return mTermUsages.size();
   }
@@ -60,5 +67,25 @@ public class TermUsageServiceHashMapBasedImpl implements TermUsageService {
 
   public int getUsageCountOf(final String pTerm) {
     return mTermUsages.get(pTerm.trim());
+  }
+
+  public Map<String, String> getTags(final List pTags, final int pMax) {
+    throw new NoSuchMethodError("this method is not yet implemented");
+  }
+
+  public int getMaxWordLength() {
+    return mMaxWordLength;
+  }
+
+  public void setMaxWordLength(final int pMaxWordLength) {
+    mMaxWordLength = pMaxWordLength;
+  }
+
+  public int getMinWordLength() {
+    return mMinWordLength;
+  }
+
+  public void setMinWordLength(final int pMinWordLength) {
+    mMinWordLength = pMinWordLength;
   }
 }

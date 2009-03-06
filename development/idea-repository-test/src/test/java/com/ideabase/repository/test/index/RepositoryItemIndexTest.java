@@ -76,6 +76,4 @@ public class RepositoryItemIndexTest extends BaseTestCase {
     }};
     final PaginatedList list = mRepositoryService.getItemsByQuery(query);
   }
-
-
 }

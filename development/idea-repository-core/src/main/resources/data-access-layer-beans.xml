@@ -25,4 +25,10 @@
     <property name="sqlMapClient" ref="sqlMapClient"/>
   </bean>
 
+  <!-- Repository Term DAO -->
+  <bean id="termDAO"
+        class="com.ideabase.repository.core.dao.impl.TermDAOImpl">
+    <property name="sqlMapClient" ref="sqlMapClient" />
+  </bean>
+
 </beans>

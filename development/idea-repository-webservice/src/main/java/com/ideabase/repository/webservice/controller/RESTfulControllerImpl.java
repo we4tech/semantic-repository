@@ -350,7 +350,7 @@ public class RESTfulControllerImpl implements RESTfulController {
   /**
    * speacially used for generating tag cloud
    */
-  private Analyzer mTagCloudAnalyzer = new StandardAnalyzer();
+  private final Analyzer mTagCloudAnalyzer;
 
   /**
    * Term usage service instance
@@ -379,7 +379,8 @@ public class RESTfulControllerImpl implements RESTfulController {
                                final WebServiceRequestHandler pRequestHandler,
                                final StateManager pStateManager,
                                final TermValueEmbedFunctionExecutor pExecutor,
-                               final TermUsageService pTermUsageService) {
+                               final TermUsageService pTermUsageService,
+                               final Analyzer pAnalyzer) {
     mRepositoryService = pRepositoryService;
     mUserService = pUserService;
     mMessageAccessor = pSourceAccessor;
@@ -388,6 +389,7 @@ public class RESTfulControllerImpl implements RESTfulController {
     mStateManager = pStateManager;
     mFunctionExecutor = pExecutor;
     mTermUsageService = pTermUsageService;
+    mTagCloudAnalyzer = pAnalyzer;
   }
 
   /**
@@ -592,12 +594,12 @@ public class RESTfulControllerImpl implements RESTfulController {
       throws ParseException, IOException {
     
     // find max article parameter
-    final String maxString = pRequest.getParameter(PARAM_MAX);
-    final int max;
-    if (maxString != null) {
-      max = Integer.parseInt(maxString);
+    final String maxTagsString = pRequest.getParameter(PARAM_MAX_TAGS);
+    final int maxTags;
+    if (maxTagsString != null) {
+      maxTags = Integer.parseInt(maxTagsString);
     } else {
-      max = DEFAULT_TAGCLOUD_MAX;
+      maxTags = DEFAULT_TAGCLOUD_MAX;
     }
     // perform search with the given query and max articles
     final PaginatedList<Hit> hits =
@@ -613,7 +615,7 @@ public class RESTfulControllerImpl implements RESTfulController {
 
     final GenericItem tagCloudHolder = new GenericItem();
     if (hits != null && !hits.isEmpty()) {
-      final Map<String, String> itemFields = new HashMap<String, String>();
+      final List<String> tags = new ArrayList<String>();
 
       // iterate each article
       for (final Hit hit : hits) {
@@ -631,18 +633,24 @@ public class RESTfulControllerImpl implements RESTfulController {
               while ((token = tokenStream.next()) != null) {
                 final String tokenString =
                     String.valueOf(token.termBuffer()).trim();
-                if (!itemFields.containsKey(tokenString)) {
+                final boolean acceptable = tokenString != null
+                    && tokenString.length() >= mTermUsageService.getMinWordLength()
+                    && tokenString.length() <= mTermUsageService.getMaxWordLength();
+                if (acceptable && !tags.contains(tokenString)) {
                   // lookup term store to find all term count
-                  int termCount = mTermUsageService.getUsageCountOf(tokenString);
-                  itemFields.put(tokenString,
-                                 String.valueOf(termCount));
+                  tags.add(tokenString);
                 }
               }
             }
           }
         }
       }
-      tagCloudHolder.setFields(itemFields);
+
+      if (!tags.isEmpty()) {
+        tagCloudHolder.setFields(mTermUsageService.getTags(tags, maxTags));
+      } else {
+        tagCloudHolder.setFields(Collections.EMPTY_MAP);
+      }
     }
     final ResponseElement responseElement = new ResponseElement(ELEMENT_ITEM, tagCloudHolder);
     generateResponse(true, pAction, pRequest, pResponse,
@@ -1053,12 +1061,6 @@ public class RESTfulControllerImpl implements RESTfulController {
     }
 
     // TODO: update related items
-/*
-    if (!pNewItem.getRelationTypes().isEmpty()) {
-      pExistingItem.setRelatedItemsMap(pNewItem.getRelatedItemsMap());
-    }
-
-*/
     // set author group.
     List<Integer> authorGroup = pExistingItem.
         getRelatedItemsByRelationType(GroupConstants.GROUP_AUTHOR);

@@ -9,15 +9,14 @@
                            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
                            http://dev.somewherein.net/schema/ext-util http://dev.somewherein.net/resources/schemas/ext-util-0.1.xsd">
 
-  <bean id="termUsageService" class="com.ideabase.repository.core.index.termUsage.TermUsageService"/>
-
   <!-- common services -->
-  <bean id="standardAnalyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
-  <bean id="keywordAnalyzer" class="org.apache.lucene.analysis.KeywordAnalyzer"/>
-  <bean id="termUsageAnalyzer" class="com.ideabase.repository.core.index.analyzer.TermUsageAnalyzer">
-    <constructor-arg index="0" ref="standardAnalyzer"/>
-    <constructor-arg index="1" ref="termUsageService"/>
+  <bean id="stopWordsFile" class="com.ideabase.repository.core.index.bean.FileBean">
+    <property name="file" value="config/stop-words.txt"/>
   </bean>
+  <bean id="standardAnalyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer">
+    <constructor-arg index="0" ref="stopWordsFile"/>
+  </bean>
+  <bean id="keywordAnalyzer" class="org.apache.lucene.analysis.KeywordAnalyzer"/>
 
   <!-- added supported embed function -->
   <!--<bean class="com.ideabase.repository.core.index.impl.TermValueEmbedFunctionExecutorImpl">
@@ -28,6 +27,7 @@
   <import resource="extfile:///./config/index-configuration/index-service-1.xml" />
   <import resource="extfile:///./config/index-configuration/index-service-2.xml" />
   <import resource="extfile:///./config/index-configuration/index-service-spellchecker.xml" />
+ <import resource="extfile:///./config/index-configuration/index-service-location.xml" />
 
   <!-- available item index services -->
   <bean id="itemIndexServices" class="com.ideabase.repository.core.bean.ObjectMap">
@@ -36,6 +36,7 @@
         <entry key="default" value-ref="itemIndex1"/>
         <entry key="aawaj" value-ref="itemIndex2"/>
         <entry key="spellchecker" value-ref="itemIndexSpellChecker"/>
+        <entry key="location" value-ref="itemIndexLocation"/>
       </map>
     </property>
   </bean>
@@ -47,6 +48,7 @@
         <entry key="default" value-ref="itemSearch1"/>
         <entry key="aawaj" value-ref="itemSearch2"/>
         <entry key="spellchecker" value-ref="itemSearchSpellChecker"/>
+       <entry key="location" value-ref="itemSearchLocation"/>
       </map>
     </property>
   </bean>

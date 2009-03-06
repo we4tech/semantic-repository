@@ -2,75 +2,57 @@
 <!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
           "http://www.ibatis.com/dtd/sql-map-2.dtd">
 
-<sqlMap namespace="Item">
+<sqlMap namespace="Term">
 
-  <resultMap id="ItemResultMap" class="Item">
+  <resultMap id="TermResultMap" class="Term">
     <result property="id" column="id"/>
-    <result property="title" column="title"/>
-    <result property="document" column="document"/>
-    <result property="createdOn" column="createdOn"/>
-    <result property="lastUpdatedOn" column="lastUpdatedOn"/>
-    <result property="indexRepository" column="indexRepository"/>
+    <result property="term" column="term"/>
+    <result property="count" column="count"/>
   </resultMap>
 
   <!--+
-      | Create new entry in to the Item table.
+      | Create new entry in to the Term table.
       +-->
-  <insert id="insertItem" parameterClass="Item">
-    INSERT INTO item(
-      title,
-      document,
-      createdOn,
-      lastUpdatedOn,
-      indexRepository
+  <insert id="insertTerm" parameterClass="Term">
+    INSERT INTO term(
+      term,
+      count,
+      field
     ) VALUES (
-      #title#,
-      #document#,
-      #createdOn#,
-      #lastUpdatedOn#,
-      #indexRepository#
+      #term#,
+      #count#,
+      #field#
     )
     <selectKey resultClass="java.lang.Integer" keyProperty="id">
-      SELECT MAX(id) as id FROM item
+      SELECT MAX(id) as id FROM term
     </selectKey>
   </insert>
 
   <!--+
-      | Update new entry in to the item table.
+      | Update new entry in to the Term table.
       +-->
-  <update id="updateItem" parameterClass="Item">
-    UPDATE item
+  <update id="updateTerm" parameterClass="Term">
+    UPDATE term
     SET
-      title = #title#,
-      document = #document#,
-      createdOn = #createdOn#,
-      lastUpdatedOn = #lastUpdatedOn#,
-      indexRepository = #indexRepository#
+      term = #term#,
+      count = #count#,
+      field = #field#
     WHERE
       id = #id#
   </update>
 
   <!--+
-      | Delete an existing entry from item table.
+      | Delete an existing entry from Term table.
       +-->
-  <delete id="deleteItems" parameterClass="Item">
+  <delete id="deleteTerm" parameterClass="Term">
     DELETE FROM
-      item
+      term
     <dynamic prepend="WHERE">
       <isNotNull property="id" prepend="AND">
         id = #id#
       </isNotNull>
-      <isNotNull property="title" prepend="AND">
-        title = #title#
-      </isNotNull>
-      <isNotNull property="createdOn" prepend="AND">
-        createdOn = #createdOn#
-      </isNotNull>
-      <isNotNull property="lastUpdatedOn" prepend="AND">
-        lastUpdatedOn = #lastUpdatedOn#
-      </isNotNull>
-      <isNotNull property="indexRepository" prepend="AND">
-        indexRepository = #indexRepository#
+      <isNotNull property="term" prepend="AND">
+        term = #term#
       </isNotNull>
     </dynamic>
   </delete>
@@ -78,31 +60,30 @@
   <!--+
       | Select a list of items from Item table.
       +-->
-  <select id="findItems" parameterClass="Item" resultMap="ItemResultMap">
+  <select id="findTerms" parameterClass="Term" resultMap="TermResultMap">
     SELECT
       id,
-      title,
-      document,
-      createdOn,
-      lastUpdatedOn,
-      indexRepository
+      term,
+      count,
+      field
     FROM
-      item
+      term
     <dynamic prepend="WHERE">
       <isNotNull property="id" prepend="AND">
-        id = #id#
+        <isNotEqual property="id" compareValue="0">
+          id = #id#
+        </isNotEqual>
       </isNotNull>
-      <isNotNull property="title" prepend="AND">
-        title = #title#
+      <isNotNull property="term" prepend="AND">
+        term = #term#
       </isNotNull>
-      <isNotNull property="createdOn" prepend="AND">
-        createdOn = #createdOn#
+      <isNotNull property="field" prepend="AND">
+        field = #field#
       </isNotNull>
-      <isNotNull property="lastUpdatedOn" prepend="AND">
-        lastUpdatedOn = #lastUpdatedOn#
-      </isNotNull>
-      <isNotNull property="indexRepository" prepend="AND">
-        indexRepository = #indexRepository#
+      <isNotNull property="count" prepend="AND">
+        <isNotEqual property="count" compareValue="0">
+          count > #count#
+        </isNotEqual>
       </isNotNull>
     </dynamic>
   </select>
@@ -110,27 +91,23 @@
   <!--+
       | Count total number of item objects
       +-->
-  <select id="countItems" parameterClass="Item" resultClass="java.lang.Integer">
+  <select id="findTermsByTerms"
+          parameterClass="list"
+          resultMap="TermResultMap">
     SELECT
-      count(id)
+      id,
+      term,
+      count,
+      field
     FROM
-      item
-    <dynamic prepend="WHERE">
-      <isNotNull property="id" prepend="AND">
-        id = #id#
-      </isNotNull>
-      <isNotNull property="title" prepend="AND">
-        title = #title#
-      </isNotNull>
-      <isNotNull property="createdOn" prepend="AND">
-        createdOn = #createdOn#
-      </isNotNull>
-      <isNotNull property="lastUpdatedOn" prepend="AND">
-        lastUpdatedOn = #lastUpdatedOn#
-      </isNotNull>
-      <isNotNull property="indexRepository" prepend="AND">
-        indexRepository = #indexRepository#
-      </isNotNull>
-    </dynamic>
+      term
+    WHERE
+      term IN
+      <iterate open="(" close=")" conjunction=",">
+         #[]#
+      </iterate>
+      AND
+        count > 0
+    ORDER BY count DESC
   </select>
 </sqlMap>

@@ -53,4 +53,14 @@
     <property name="repositoryItemSearchServices" ref="itemSearchServices"/>
   </bean>
 
+  <!--
+    Term usage service to store term related data
+  -->
+  <bean id="termUsageService"
+        class="com.ideabase.repository.core.index.service.TermUsageServiceDatabaseBasedImpl">
+    <constructor-arg index="0" ref="termDAO"/>
+    <property name="minWordLength" value="3"/>
+    <property name="maxWordLength" value="12"/>
+  </bean>
+
 </beans>

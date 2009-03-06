@@ -118,18 +118,21 @@ public class HitListObject implements XmlSerializable, PHPSerializable {
           append(String.valueOf(hit.getId())).append("', ");
       pBuilder.append(String.valueOf(hit.getScore())).
                append(COMMA).append(ARRAY_START);
+
+      // iterating thorugh all defiend selectable fields
       if (selectableFieldsAreDefined) {
         final GenericItem item =
             mRepositoryService.getItem(hit.getId(), GenericItem.class);
+
         boolean commaNeeded = false;
         for (final String field : mSelectableFields) {
-          if (!commaNeeded) {
-            commaNeeded = true;
-          } else {
-            pBuilder.append(COMMA);
-          }
           final String value = item.getField(field);
           if (value != null) {
+            if (commaNeeded) {
+              pBuilder.append(COMMA);
+            } else {
+              commaNeeded = true;
+            }
             pBuilder.append(QUOTE).
                      append(escapeIllegalText(field)).append(QUOTE).
                      append(ASSIGN).append(QUOTE).

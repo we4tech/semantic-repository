@@ -23,7 +23,7 @@
   </logger>
 
   <root>
-    <level value="WARN"/>
+    <level value="DEBUG"/>
     <!--<appender-ref ref="FILE"/>-->
     <appender-ref ref="CONSOLE"/>
   </root>

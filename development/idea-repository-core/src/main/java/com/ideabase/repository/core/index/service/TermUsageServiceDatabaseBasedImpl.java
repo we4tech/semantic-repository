@@ -27,6 +27,8 @@ public class TermUsageServiceDatabaseBasedImpl implements TermUsageService {
 
   private final TermDAO mTermDAO;
   private static final String DEFAULT_FIELD = "default";
+  private int mMinWordLength = 3;
+  private int mMaxWordLength = 12;
 
   public TermDAO getTermDAO() {
     return mTermDAO;
@@ -42,20 +44,22 @@ public class TermUsageServiceDatabaseBasedImpl implements TermUsageService {
 
   public void incrementTermCount(final String pTerm, final String pField) {
     final String trimmedTerm = pTerm.trim();
-    final Term term = getExistingTerm(trimmedTerm);
+    if (isAcceptableLength(trimmedTerm)) {
+      final Term term = getExistingTerm(trimmedTerm);
 
-    // if term exists increment the value
-    if (term != null) {
-      term.setCount(term.getCount() + 1);
-      term.setField(pField);
-      mTermDAO.updateTerm(term);
-    } else {
-      // otherwise create a new term with count 1
-      mTermDAO.createTerm(
-          new Term.Builder()
-          .term(trimmedTerm)
-          .count(1)
-          .build());
+      // if term exists increment the value
+      if (term != null) {
+        term.setCount(term.getCount() + 1);
+        term.setField(pField);
+        mTermDAO.updateTerm(term);
+      } else {
+        // otherwise create a new term with count 1
+        mTermDAO.createTerm(
+            new Term.Builder()
+            .term(trimmedTerm)
+            .count(1)
+            .build());
+      }
     }
   }
 
@@ -70,11 +74,20 @@ public class TermUsageServiceDatabaseBasedImpl implements TermUsageService {
   }
 
   public void decrementTermCount(final String pTerm) {
-    final Term term = getExistingTerm(pTerm.trim());
-    if (term != null && term.getCount() > 0) {
-      term.setCount(term.getCount() - 1);
-      mTermDAO.updateTerm(term);
+    final String termString = pTerm.trim();
+    if (isAcceptableLength(termString)) {
+      final Term term = getExistingTerm(termString);
+      if (term != null && term.getCount() > 0) {
+        term.setCount(term.getCount() - 1);
+        mTermDAO.updateTerm(term);
+      }
     }
+  }
+
+  private boolean isAcceptableLength(final String pTermString) {
+    return (pTermString != null
+            && pTermString.length() >= mMinWordLength
+            && pTermString.length() <= mMaxWordLength);
   }
 
   public int length() {
@@ -92,6 +105,35 @@ public class TermUsageServiceDatabaseBasedImpl implements TermUsageService {
       return terms.get(0).getCount();
     }
     return 0;
+  }
+
+  public Map<String, String> getTags(final List pTags, final int pMax) {
+    final Map<String, String> map = new HashMap<String, String>();
+    final List<Term> terms = mTermDAO.findTermsByCollection(pTags, 0, pMax);
+    for (final Term term : terms) {
+      map.put(term.getTerm(), String.valueOf(term.getCount()));
+    }
+    return map;
+  }
+
+  public void decrementTermCount(final String pTerm, final String pField) {
+    throw new NoSuchMethodError("this method is not yet implemented");
+  }
+
+  public void setMaxWordLength(final int pMaxWordLength) {
+    mMaxWordLength = pMaxWordLength;
+  }
+
+  public int getMaxWordLength() {
+    return mMaxWordLength;
+  }
+
+  public void setMinWordLength(final int pMinWordLength) {
+    mMinWordLength = pMinWordLength;
+  }
+
+  public int getMinWordLength() {
+    return mMinWordLength;
   }
 
   /**
