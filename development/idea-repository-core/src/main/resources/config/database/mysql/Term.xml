@@ -8,6 +8,8 @@
     <result property="id" column="id"/>
     <result property="term" column="term"/>
     <result property="count" column="count"/>
+    <result property="field" column="field"/>
+    <result property="itemId" column="item_id"/>
   </resultMap>
 
   <!--+
@@ -17,11 +19,13 @@
     INSERT INTO term(
       term,
       count,
-      field
+      field,
+      item_id
     ) VALUES (
       #term#,
       #count#,
-      #field#
+      #field#,
+      #itemId#
     )
     <selectKey resultClass="java.lang.Integer" keyProperty="id">
       SELECT MAX(id) as id FROM term
@@ -36,7 +40,8 @@
     SET
       term = #term#,
       count = #count#,
-      field = #field#
+      field = #field#,
+      item_id = #itemId#
     WHERE
       id = #id#
   </update>
@@ -80,6 +85,9 @@
       <isNotNull property="field" prepend="AND">
         field = #field#
       </isNotNull>
+      <isNotNull property="itemId" prepend="AND">
+        item_id = #itemId#
+      </isNotNull>
       <isNotNull property="count" prepend="AND">
         <isNotEqual property="count" compareValue="0">
           count > #count#
@@ -98,7 +106,8 @@
       id,
       term,
       count,
-      field
+      field,
+      item_id
     FROM
       term
     WHERE
@@ -110,4 +119,34 @@
         count > 0
     ORDER BY count DESC
   </select>
+
+  <!--+
+      | Find terms by the specified item id
+      +-->
+  <select id="findTermsByItemIds"
+          parameterClass="TermRequest"
+          resultMap="TermResultMap">
+    SELECT
+      id,
+      term,
+      field,
+      item_id,
+      count(term) as count
+    FROM
+      term
+    WHERE
+      item_id IN
+      <iterate open="(" close=")" conjunction="," property="itemIds"><![CDATA[
+         #itemIds[]#
+      ]]></iterate>
+      AND
+      field IN
+      <iterate open="(" close=")" conjunction="," property="fields"><![CDATA[
+         #fields[]#
+      ]]></iterate>
+    GROUP BY term
+    ORDER BY count DESC
+  </select>
+
+
 </sqlMap>

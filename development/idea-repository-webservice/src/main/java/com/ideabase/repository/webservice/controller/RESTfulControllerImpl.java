@@ -615,7 +615,7 @@ public class RESTfulControllerImpl implements RESTfulController {
 
     final GenericItem tagCloudHolder = new GenericItem();
     if (hits != null && !hits.isEmpty()) {
-      final List<String> tags = new ArrayList<String>();
+      final List<Integer> itemIds = new ArrayList<Integer>();
 
       // iterate each article
       for (final Hit hit : hits) {
@@ -623,31 +623,14 @@ public class RESTfulControllerImpl implements RESTfulController {
             mRepositoryService.getItem(hit.getId(), GenericItem.class);
 
         if (item != null) {
-          // collect terms from the fields which was mentioned in select parameter
-          for (final String field : fields) {
-            final String value = item.getField(field.trim());
-            if (value != null) {
-              final TokenStream tokenStream = mTagCloudAnalyzer.
-                  tokenStream(EMPTY_STRING, new StringReader(value));
-              Token token = null;
-              while ((token = tokenStream.next()) != null) {
-                final String tokenString =
-                    String.valueOf(token.termBuffer()).trim();
-                final boolean acceptable = tokenString != null
-                    && tokenString.length() >= mTermUsageService.getMinWordLength()
-                    && tokenString.length() <= mTermUsageService.getMaxWordLength();
-                if (acceptable && !tags.contains(tokenString)) {
-                  // lookup term store to find all term count
-                  tags.add(tokenString);
-                }
-              }
-            }
-          }
+          // lookup term store to find all term count
+          itemIds.add(item.getId());
         }
       }
 
-      if (!tags.isEmpty()) {
-        tagCloudHolder.setFields(mTermUsageService.getTags(tags, maxTags));
+      if (!itemIds.isEmpty()) {
+        tagCloudHolder.setFields(mTermUsageService.
+            getTags(itemIds, Arrays.asList(fields), maxTags));
       } else {
         tagCloudHolder.setFields(Collections.EMPTY_MAP);
       }

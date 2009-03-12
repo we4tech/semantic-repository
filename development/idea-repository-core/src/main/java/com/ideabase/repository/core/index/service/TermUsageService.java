@@ -37,6 +37,15 @@ public interface TermUsageService {
    */
   void incrementTermCount(final String pTerm, final String pField);
 
+
+  /**
+   * store new term reference
+   * @param pTerm term content
+   * @param pField found term on the field
+   * @param pItemId found term on the item
+   */
+  void storeTerm(final String pTerm, final String pField, final int pItemId);
+
   /**
    * Decrement count for the specific term {@code pTerm}
    * @param pTerm string
@@ -70,12 +79,15 @@ public interface TermUsageService {
   int getUsageCountOf(final String pTerm);
 
   /**
-   * Retrieve count for each tags and return in a hash map.
-   * @param pTags list of tags
-   * @param pMax total number of tags
-   * @return map of tag cloud data
+   * Retrieve tags from the given list of item ids.
+   * @param pItemIds list of items ids
+   * @param pFields list of fields from where tags will be generated
+   * @param pMax maximum number of tags need to be retrieved.  @return map of tag cloud data
+   * @return {@code Map} of tags and their respective hit count
    */
-  Map<String, String> getTags(final List pTags, final int pMax);
+  Map<String, String> getTags(final List<Integer> pItemIds, 
+                              final List<String> pFields,
+                              final int pMax);
 
   /**
    * Get maximum number of allowed words

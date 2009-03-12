@@ -24,6 +24,7 @@ public class Term {
   private String mTerm;
   private int mCount;
   private String mField;
+  private int mItemId;
 
   public int getId() {
     return mId;
@@ -57,6 +58,14 @@ public class Term {
     mField = pField;
   }
 
+  public int getItemId() {
+    return mItemId;
+  }
+
+  public void setItemId(final int pItemId) {
+    mItemId = pItemId;
+  }
+
   public static class Builder {
     private Term mTerm = new Term();
 
@@ -76,6 +85,11 @@ public class Term {
 
     public Builder field(final String pField) {
       mTerm.setField(pField);
+      return this;
+    }
+
+    public Builder itemId(final int pItemId) {
+      mTerm.setItemId(pItemId);
       return this;
     }
 

@@ -63,6 +63,20 @@ public class TermUsageServiceDatabaseBasedImpl implements TermUsageService {
     }
   }
 
+  public void storeTerm(final String pTerm,
+                        final String pField,
+                        final int pItemId) {
+    final String trimmedTerm = pTerm.trim();
+    if (isAcceptableLength(trimmedTerm)) {
+      final Term term = new Term
+          .Builder()
+          .term(pTerm)
+          .field(pField)
+          .itemId(pItemId).build();
+      mTermDAO.createTerm(term);
+    }
+  }
+
   private Term getExistingTerm(final String pTerm) {
     // find existing term
     final List<Term> terms = mTermDAO.
@@ -107,9 +121,12 @@ public class TermUsageServiceDatabaseBasedImpl implements TermUsageService {
     return 0;
   }
 
-  public Map<String, String> getTags(final List pTags, final int pMax) {
+  public Map<String, String> getTags(final List<Integer> pItemIds,
+                                     final List<String> pFields,
+                                     final int pMax) {
     final Map<String, String> map = new HashMap<String, String>();
-    final List<Term> terms = mTermDAO.findTermsByCollection(pTags, 0, pMax);
+    final List<Term> terms = mTermDAO.
+        findTermsByItemIds(pItemIds, pFields, 0, pMax);
     for (final Term term : terms) {
       map.put(term.getTerm(), String.valueOf(term.getCount()));
     }

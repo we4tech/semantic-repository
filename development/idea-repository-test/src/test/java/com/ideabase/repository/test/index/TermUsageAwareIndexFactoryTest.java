@@ -18,6 +18,7 @@ package com.ideabase.repository.test.index;
 import com.ideabase.repository.test.BaseTestCase;
 import com.ideabase.repository.test.TestCaseRepositoryHelper;
 import com.ideabase.repository.core.index.RepositoryItemIndex;
+import com.ideabase.repository.core.index.service.TermUsageService;
 import com.ideabase.repository.core.index.factory.TermUsageAwareIndexFactory;
 import com.ideabase.repository.core.index.impl.RepositoryItemIndexImpl;
 import com.ideabase.repository.core.index.filter.TermUsageFilter;
@@ -34,10 +35,13 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.search.QueryTermVector;
+import org.apache.lucene.document.Document;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * @author <a href="http://hasan.we4tech.com">nhm tanveer...(hasan)</a>
@@ -47,6 +51,7 @@ public class TermUsageAwareIndexFactoryTest extends BaseTestCase {
   private RepositoryService mRepositoryService;
   private IndexFactory mIndexFactory;
   private RepositoryItemIndex mItemIndex;
+  private TermUsageService mTermUsageService;
 
   @Override
   protected void setUp() throws Exception {
@@ -57,73 +62,31 @@ public class TermUsageAwareIndexFactoryTest extends BaseTestCase {
         getBean(APIServiceKey.REPOSITORY_SERVICE);
     mIndexFactory = (IndexFactory) mContext.getBean("indexFactory1");
     mItemIndex = (RepositoryItemIndex) mContext.getBean("itemIndex1");
+    mTermUsageService = (TermUsageService) mContext.
+        getBean(CoreServiceKey.TERM_USAGE_SERVICE);
   }
 
-  public GenericItem[] testShouldProperlyCountTokensWhenIndexingNewItem()
-    throws IOException, InterruptedException {
+  public void testShouldSuccessfullyAddNewDocument()
+      throws IOException, InterruptedException {
 
-    // disable threaded execution for index factory
-    mRepositoryItemIndex.setThreadedTaskExecution(false);
-
-    // create item - 1
+    mItemIndex.setThreadedTaskExecution(false);
     final GenericItem item = new GenericItem();
-    item.setTitle("token1 token2 token3");
-    item.addField("field1", "value1 value2 value3");
-    item.addField("field2", "value1 value2 value3 ab abc abcdefghijlm abcdefghijlmn");
-    assertNotNull(mRepositoryService.save(item));
+    item.setTitle("i love to hang out with friends.");
+    item.addField("interest", "apple, linux, mac");
 
-    // create item - 2
-    final GenericItem item2 = new GenericItem();
-    item2.setTitle("token2");
-    item2.addField("field1", "value3");
-    assertNotNull(mRepositoryService.save(item2));
-
-    // verify the stored tokens and their usage count
-    assertFalse(TermUsageAwareIndexFactory.mTermUsageService.map().isEmpty());
-    System.out.println(TermUsageAwareIndexFactory.mTermUsageService.map());
-
-    assertEquals(2, TermUsageAwareIndexFactory.mTermUsageService.map().get("value1").intValue());
-    assertEquals(2, TermUsageAwareIndexFactory.mTermUsageService.map().get("value2").intValue());
-    assertEquals(3, TermUsageAwareIndexFactory.mTermUsageService.map().get("value3").intValue());
-
-    assertEquals(1, TermUsageAwareIndexFactory.mTermUsageService.map().get("token1").intValue());
-    assertEquals(2, TermUsageAwareIndexFactory.mTermUsageService.map().get("token2").intValue());
-    assertEquals(1, TermUsageAwareIndexFactory.mTermUsageService.map().get("token3").intValue());
-    
-    return new GenericItem[] {item, item2};
+    final int itemId = mRepositoryService.save(item);
+    assertTrue(itemId != 0);
   }
 
-  public void testShouldReduceTheTokenCountWhenAnIndexIsRemoved()
-    throws IOException, InterruptedException {
+  // TODO: this are not exactly unit test, mostly used for experimenting.
+  public void testShouldSuccessfullyPerformSearch() {
+    assertNotNull(mTermUsageService);
 
-    // disable threaded task execution
-    mRepositoryItemIndex.setThreadedTaskExecution(false);
-
-    // create new items
-    final GenericItem[] items = testShouldProperlyCountTokensWhenIndexingNewItem();
-    System.out.println(TermUsageAwareIndexFactory.mTermUsageService.map());
-
-    // remove recently created items
-    for (final GenericItem item : items) {
-      System.out.println("Deleting - " + item.getId());
-      mRepositoryService.delete(item.getId());
-    }
-
-    // these items shouldn't be existing
-    for (final GenericItem item : items) {
-      assertNull(mRepositoryService.getItem(item.getId(), GenericItem.class));
-    }
-    System.out.println(TermUsageAwareIndexFactory.mTermUsageService.map());
-
-    // verify the usage of the tokens
-    assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("value1").intValue());
-    assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("value2").intValue());
-    assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("value3").intValue());
-
-    assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("token1").intValue());
-    assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("token2").intValue());
-    assertEquals(0, TermUsageAwareIndexFactory.mTermUsageService.map().get("token3").intValue());
-    Thread.sleep(4000);
+    final int maxRows = mRepositoryService.getAllItemsCount();
+    final List<Integer> itemIds =
+        mRepositoryService.getAllItems(maxRows - 3, maxRows);
+    final Map<String, String> tags = mTermUsageService.
+        getTags(itemIds, Arrays.asList("interest"), 10);
+    LOG.debug(tags);
   }
-
 }

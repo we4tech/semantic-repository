@@ -17,6 +17,7 @@ package com.ideabase.repository.core.dao.impl;
 
 import com.ideabase.repository.core.dao.TermDAO;
 import com.ideabase.repository.core.dao.Term;
+import com.ideabase.repository.core.dao.TermRequest;
 import com.ideabase.repository.common.exception.ServiceException;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class TermDAOImpl extends SqlMapClientDaoSupport implements TermDAO {
   private static final String QUERY_UPDATE = "updateTerm";
   private static final String QUERY_FIND_TERMS = "findTerms";
   private static final String QUERY_FIND_TERMS_BY_TERMS = "findTermsByTerms";
+  private static final String QUERY_FIND_TERMS_BY_ITEM_IDS = "findTermsByItemIds";
   private static final String QUERY_DELETE = "deleteTerm";
 
   public Integer createTerm(final Term pTerm) {
@@ -53,11 +55,15 @@ public class TermDAOImpl extends SqlMapClientDaoSupport implements TermDAO {
         queryForList(QUERY_FIND_TERMS, pTerm, pOffset, pMax);
   }
 
-  public List<Term> findTermsByCollection(final List<String> pTerms,
-                                          final Integer pOffset,
-                                          final Integer pMax) {
+  public List<Term> findTermsByItemIds(final List<Integer> pItemIds,
+                                       final List<String> pFields,
+                                       final Integer pOffset,
+                                       final Integer pMax) {
+    final TermRequest request = new TermRequest();
+    request.setFields(pFields);
+    request.setItemIds(pItemIds);
     return getSqlMapClientTemplate().queryForList(
-        QUERY_FIND_TERMS_BY_TERMS, pTerms, pOffset, pMax);
+        QUERY_FIND_TERMS_BY_ITEM_IDS, request, pOffset, pMax);
   }
 
   public void deleteTerm(final String pTerm) {

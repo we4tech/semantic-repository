@@ -54,8 +54,9 @@ public interface ItemDAO {
    * @param pMax maximum rows .
    * @return a list of {@code Integer} id of {@code Item}.
    */
-  List<Item> findItems(final Item pItem, final Integer pSkip,
-                            final Integer pMax);
+  List<Item> findItems(final Item pItem, 
+                       final Integer pSkip,
+                       final Integer pMax);
 
   /**
    * Retrieve {@code Item} by specified id.

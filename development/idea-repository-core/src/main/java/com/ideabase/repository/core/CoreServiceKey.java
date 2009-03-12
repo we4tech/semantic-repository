@@ -30,26 +30,27 @@ package com.ideabase.repository.core;
  */
 public class CoreServiceKey {
 
-  // ---------- DAO RELATED OBJECTS ---------------------
+  // ---------- DAO AND SERVICE RELATED OBJECTS ---------------------
   public static final String ITEM_DAO = "itemDAO";
   public static final String ITEM_MAPPING_DAO = "itemMappingDAO";
   public static final String TERM_DAO = "termDAO";
+  public static final String EVENT_MANAGER = "eventManager";
+  public static final String TERM_USAGE_SERVICE = "termUsageService";
 
   // ---------- CACHE RELATED OBJECTS ---------------------
   public static final String CLASS_CACHE = "classCache";
   public static final String CACHE_ADMINISTRATOR = "cacheAdministrator";
-  
+
   // ---------- CACHE KEY RELATED CONSTANTS ---------------
   public static final String ANN_FIELD_INDEX = "index";
   public static final String ANN_FIELD_STORE = "store";
-  public static final String ANN_FIELD_TERM_VECTOR = "termVector";
 
+  public static final String ANN_FIELD_TERM_VECTOR = "termVector";
   public static final String ANN_INDEXABLE_INDEX = "index";
   public static final String ANN_INDEXABLE_STORE = "store";
   public static final String ANN_INDEXABLE_TERM_VECTOR = "termVector";
   public static final String REPOSITORY_ITEM_INDEX = "itemIndex1";
   public static final String REPOSITORY_ITEM_SEARCH = "itemSearch1";
-  public static final String EVENT_MANAGER = "eventManager";
 
   // ---------- JMX Beans --------------------------------
   public static final String INDEX_ADMINISTRATION_JMX_BEAN =

@@ -18,12 +18,12 @@
     </layout>
   </appender>
 
-  <logger name="com.ideabase.repository.core.index">
+  <logger name="com.ideabase.repository.test">
     <level value="DEBUG"/>
   </logger>
 
   <root>
-    <level value="DEBUG"/>
+    <level value="WARN"/>
     <!--<appender-ref ref="FILE"/>-->
     <appender-ref ref="CONSOLE"/>
   </root>

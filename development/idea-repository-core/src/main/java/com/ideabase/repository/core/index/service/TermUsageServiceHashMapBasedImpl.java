@@ -43,6 +43,10 @@ public class TermUsageServiceHashMapBasedImpl implements TermUsageService {
     throw new NoSuchMethodError("this method is not yet implemented");
   }
 
+  public void storeTerm(final String pTerm, final String pField, final int pItemId) {
+    throw new NoSuchMethodError("this method is not yet implemented");
+  }
+
   public void decrementTermCount(final String pTerm) {
     final String term = pTerm.trim();
     if (mTermUsages.containsKey(term)) {
@@ -69,7 +73,9 @@ public class TermUsageServiceHashMapBasedImpl implements TermUsageService {
     return mTermUsages.get(pTerm.trim());
   }
 
-  public Map<String, String> getTags(final List pTags, final int pMax) {
+  public Map<String, String> getTags(final List<Integer> pItemIds,
+                                     final List<String> pFields,
+                                     final int pMax) {
     throw new NoSuchMethodError("this method is not yet implemented");
   }
 

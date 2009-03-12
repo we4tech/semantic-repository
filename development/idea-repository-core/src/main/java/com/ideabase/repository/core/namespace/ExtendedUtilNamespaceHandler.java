@@ -133,7 +133,7 @@ public class ExtendedUtilNamespaceHandler extends NamespaceHandlerSupport {
         // if cache doesnt hold any properties, load the properties file
         // and cache.
         if (scopedProperties == null) {
-          System.out.println("__PTH - " + propertiesPath);
+          LOG.debug("Properties path - " + propertiesPath);
           scopedProperties = loadPropertiesAndCache(propertiesPath);
         }
 

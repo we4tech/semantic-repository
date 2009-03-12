@@ -18,22 +18,26 @@ package com.ideabase.repository.core.dao;
 import java.util.List;
 
 /**
- * Term data access object
+ * Build request object for retrieving list of terms from the storage.
  * @author <a href="http://hasan.we4tech.com">nhm tanveer...(hasan)</a>
  */
-public interface TermDAO {
+public class TermRequest {
+  private List<String> mFields;
+  private List<Integer> mItemIds;
 
-  Integer createTerm(final Term pTerm);
-  void updateTerm(final Term pTerm);
+  public List<String> getFields() {
+    return mFields;
+  }
 
-  List<Term> findTerms(final Term pTerm,
-                       final Integer pOffset,
-                       final Integer pMax);
+  public void setFields(final List<String> pFields) {
+    mFields = pFields;
+  }
 
-  List<Term> findTermsByItemIds(final List<Integer> pItemIds,
-                                final List<String> pFields,
-                                final Integer pOffset,
-                                final Integer pMax);
+  public List<Integer> getItemIds() {
+    return mItemIds;
+  }
 
-  void deleteTerm(final String pTerm);
+  public void setItemIds(final List<Integer> pItemIds) {
+    mItemIds = pItemIds;
+  }
 }

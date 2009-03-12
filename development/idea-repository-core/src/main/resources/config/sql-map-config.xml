@@ -9,6 +9,7 @@
   <typeAlias alias="ItemMapping"
              type="com.ideabase.repository.core.dao.ItemMapping"/>
   <typeAlias alias="Term" type="com.ideabase.repository.core.dao.Term"/>
+  <typeAlias alias="TermRequest" type="com.ideabase.repository.core.dao.TermRequest"/>
 
   <!-- SQL Mapping files -->
   <sqlMap resource="config/database/mysql/Item.xml"/>

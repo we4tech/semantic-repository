@@ -44,7 +44,7 @@ public class BaseTestCase extends MockObjectSupportTestCase {
    * Base logger instance for all test child test cases.
    */
   public static final Logger LOG = LogManager.getLogger(BaseTestCase.class);
-  public ApplicationContext mContext;
+  public ClassPathXmlApplicationContext mContext;
 
   public BaseTestCase() {
     initiate();
