@@ -2,7 +2,7 @@
   <parent>
     <artifactId>idea-repository-parent</artifactId>
     <groupId>com.ideabase.repository</groupId>
-    <version>0.5</version>
+    <version>0.6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ideabase.repository.webservice.ruby.client</groupId>

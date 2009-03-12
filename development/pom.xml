@@ -21,7 +21,7 @@
   <groupId>com.ideabase.repository</groupId>
   <artifactId>idea-repository-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.5</version>
+  <version>0.6</version>
   <name>Content repository parent project</name>
 
   <!-- Module list -->

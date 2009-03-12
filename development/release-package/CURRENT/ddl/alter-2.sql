@@ -1,2 +1,0 @@
-ALTER TABLE `item` CHARACTER SET utf8;
-ALTER TABLE `itemmapping` CHARACTER SET utf8;

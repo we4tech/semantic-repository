@@ -2,14 +2,14 @@
   <parent>
     <artifactId>idea-repository-parent</artifactId>
     <groupId>com.ideabase.repository</groupId>
-    <version>0.5</version>
+    <version>0.6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ideabase.repository.webapp</groupId>
   <artifactId>idea-repository-webapp</artifactId>
   <packaging>war</packaging>
   <name>idea-repository-webapp Maven Webapp</name>
-  <version>0.5</version>
+  <version>0.6</version>
   <url>http://maven.apache.org</url>
   <build>
     <finalName>idea-repository-webapp</finalName>
