@@ -30,6 +30,8 @@ import org.apache.log4j.LogManager;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import com.ideabase.repository.core.index.service.TermUsageService;
 import static com.ideabase.repository.core.helper.IndexHelper.isAcceptableFieldNameForTokenCollection;
@@ -48,12 +50,16 @@ public class TermUsageAwareLuceneIndexWriter implements LuceneIndexWriter {
 
   private final LuceneIndexWriter mBaseLuceneIndexWriter;
   private final TermUsageService mTermUsageService;
+  private final Executor mAsyncTaskExecutor = Executors.newFixedThreadPool(5);
+  private boolean mEnableAsyncTermStore = false;
 
   public TermUsageAwareLuceneIndexWriter(
     final LuceneIndexWriter pBaseLuceneIndexWriter,
-    final TermUsageService pTermUsageService) {
+    final TermUsageService pTermUsageService,
+    final boolean pEnableAsyncTermStore) {
     mBaseLuceneIndexWriter = pBaseLuceneIndexWriter;
     mTermUsageService = pTermUsageService;
+    mEnableAsyncTermStore = pEnableAsyncTermStore;
   }
 
   public void addDocument(final Document pDocument) throws IOException {
@@ -65,6 +71,14 @@ public class TermUsageAwareLuceneIndexWriter implements LuceneIndexWriter {
                           final Analyzer pAnalyzer) throws IOException {
     mBaseLuceneIndexWriter.addDocument(pDocument, pAnalyzer);
     parseTermsFromDocument(pDocument, pAnalyzer);
+  }
+
+  public boolean isEnableAsyncTermStore() {
+    return mEnableAsyncTermStore;
+  }
+
+  public void setEnableAsyncTermStore(final boolean pEnableAsyncTermStore) {
+    mEnableAsyncTermStore = pEnableAsyncTermStore;
   }
 
   /**
@@ -80,7 +94,8 @@ public class TermUsageAwareLuceneIndexWriter implements LuceneIndexWriter {
       final Field field = (Field) fieldObject;
       try {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("PTFD: caculating tokens for - " + field.name() + " - " + isAcceptableFieldNameForTokenCollection(field.name()));
+          LOG.debug("caculating tokens for - " + field.name() + " - " +
+              isAcceptableFieldNameForTokenCollection(field.name()));
         }
         // retrieve associated item id
         final Field itemIdField = pDocument.getField(ObjectBase.INDEX_FIELD_ID);
@@ -94,14 +109,29 @@ public class TermUsageAwareLuceneIndexWriter implements LuceneIndexWriter {
           if (tokenStream != null) {
             Token token = null;
             while ((token = tokenStream.next()) != null) {
+              // TODO: store token in async mode, need to use thread worker.
               final String tokenString = String.valueOf(token.termBuffer()).trim();
-              mTermUsageService.storeTerm(tokenString, field.name(), itemId);
+              submitNewTermStoreRequest(tokenString, field.name(), itemId);
             }
           }
         }
       } catch(Exception e) {
         LOG.warn(e);
       }
+    }
+  }
+
+  private void submitNewTermStoreRequest(final String pTokenString,
+                                         final String pFieldName,
+                                         final int pItemId) {
+    if (isEnableAsyncTermStore()) {
+      mAsyncTaskExecutor.execute(new Runnable() {
+        public void run() {
+          mTermUsageService.storeTerm(pTokenString, pFieldName, pItemId);
+        }
+      });
+    } else {
+      mTermUsageService.storeTerm(pTokenString, pFieldName, pItemId);
     }
   }
 

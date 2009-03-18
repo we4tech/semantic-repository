@@ -62,6 +62,8 @@ public class TermDAOImpl extends SqlMapClientDaoSupport implements TermDAO {
     final TermRequest request = new TermRequest();
     request.setFields(pFields);
     request.setItemIds(pItemIds);
+    request.setMax(pMax);
+    request.setOffset(pOffset);
     return getSqlMapClientTemplate().queryForList(
         QUERY_FIND_TERMS_BY_ITEM_IDS, request, pOffset, pMax);
   }

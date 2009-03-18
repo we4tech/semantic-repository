@@ -48,7 +48,7 @@
         <entry key="default" value-ref="itemSearch1"/>
         <entry key="aawaj" value-ref="itemSearch2"/>
         <entry key="spellchecker" value-ref="itemSearchSpellChecker"/>
-       <entry key="location" value-ref="itemSearchLocation"/>
+        <entry key="location" value-ref="itemSearchLocation"/>
       </map>
     </property>
   </bean>

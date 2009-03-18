@@ -48,12 +48,16 @@ public class TermUsageAwareLuceneIndexReader implements LuceneIndexReader {
     LogManager.getLogger(TermUsageAwareLuceneIndexReader.class);
   private final LuceneIndexReader mBaseLuceneIndexReader;
   private final TermUsageService mTermUsageService;
+  private boolean mEnableAsyncTermStore = false;
 
   public TermUsageAwareLuceneIndexReader(
     final LuceneIndexReader pLuceneIndexReader,
-    final TermUsageService pTermUsageService) {
+    final TermUsageService pTermUsageService,
+    final boolean pEnableAsyncTermStore) {
+
     mBaseLuceneIndexReader = pLuceneIndexReader;
     mTermUsageService = pTermUsageService;
+    mEnableAsyncTermStore = pEnableAsyncTermStore;
   }
 
   public void close() throws IOException {

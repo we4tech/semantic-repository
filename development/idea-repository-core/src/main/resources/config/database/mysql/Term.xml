@@ -146,6 +146,7 @@
       ]]></iterate>
     GROUP BY term
     ORDER BY count DESC
+    LIMIT #offset#, #max#
   </select>
 
 

@@ -30,6 +30,7 @@ public class TermUsageAwareIndexFactoryBean extends SimpleIndexFactoryBean {
 
   private TermUsageAwareIndexFactory mFactory;
   private TermUsageService mTermUsageService;
+  private boolean mEnableAsyncTermStore = false;
 
   public void setTermUsageService(final TermUsageService pTermUsageService) {
     mTermUsageService = pTermUsageService;
@@ -44,6 +45,15 @@ public class TermUsageAwareIndexFactoryBean extends SimpleIndexFactoryBean {
     super.afterPropertiesSet();
 
     mFactory = new TermUsageAwareIndexFactory(
-      (SimpleIndexFactory) super.getObject(), mTermUsageService); 
+      (SimpleIndexFactory) super.getObject(), mTermUsageService);
+    mFactory.setEnableAsyncTermStore(mEnableAsyncTermStore);
+  }
+
+  public boolean isEnableAsyncTermStore() {
+    return mEnableAsyncTermStore;
+  }
+
+  public void setEnableAsyncTermStore(final boolean pEnableAsyncTermStore) {
+    mEnableAsyncTermStore = pEnableAsyncTermStore;
   }
 }

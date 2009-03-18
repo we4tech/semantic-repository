@@ -30,6 +30,7 @@ public class TermUsageAwareIndexFactory implements IndexFactory {
 
   private final SimpleIndexFactory mBaseIndexFactory;
   public static TermUsageService mTermUsageService;
+  private boolean mEnableAsyncTermStore = false;
 
   public TermUsageAwareIndexFactory(
     final SimpleIndexFactory pBaseIndexFactory,
@@ -39,12 +40,26 @@ public class TermUsageAwareIndexFactory implements IndexFactory {
   }
 
   public LuceneIndexReader getIndexReader() {
+
     return new TermUsageAwareLuceneIndexReader(
-      mBaseIndexFactory.getIndexReader(), mTermUsageService);
+        mBaseIndexFactory.getIndexReader(),
+        mTermUsageService,
+        mEnableAsyncTermStore);
   }
 
   public LuceneIndexWriter getIndexWriter() {
+
     return new TermUsageAwareLuceneIndexWriter(
-      mBaseIndexFactory.getIndexWriter(), mTermUsageService);
+        mBaseIndexFactory.getIndexWriter(),
+        mTermUsageService,
+        mEnableAsyncTermStore);
+  }
+
+  public boolean isEnableAsyncTermStore() {
+    return mEnableAsyncTermStore;
+  }
+
+  public void setEnableAsyncTermStore(final boolean pEnableAsyncTermStore) {
+    mEnableAsyncTermStore = pEnableAsyncTermStore;
   }
 }

@@ -24,6 +24,8 @@ import java.util.List;
 public class TermRequest {
   private List<String> mFields;
   private List<Integer> mItemIds;
+  private int mOffset;
+  private int mMax;
 
   public List<String> getFields() {
     return mFields;
@@ -39,5 +41,21 @@ public class TermRequest {
 
   public void setItemIds(final List<Integer> pItemIds) {
     mItemIds = pItemIds;
+  }
+
+  public int getOffset() {
+    return mOffset;
+  }
+
+  public void setOffset(final int pOffset) {
+    mOffset = pOffset;
+  }
+
+  public int getMax() {
+    return mMax;
+  }
+
+  public void setMax(final int pMax) {
+    mMax = pMax;
   }
 }
